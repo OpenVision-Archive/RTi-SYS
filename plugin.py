@@ -1,0 +1,360 @@
+from Plugins.Plugin import PluginDescriptor
+from Components.ActionMap import ActionMap
+from Components.ConfigList import ConfigListScreen
+from Components.Label import Label
+from Components.Sources.StaticText import StaticText
+from Screens.Screen import Screen
+from os import popen
+from enigma import eTimer
+#
+from Components.Sources.List import List
+from Tools.HardwareInfo import HardwareInfo
+import os
+from Components.Pixmap import Pixmap
+#
+import Screens.InfoBar
+from enigma import *
+from Components.config import configfile, getConfigListEntry, ConfigEnableDisable, \
+	ConfigYesNo, ConfigText, ConfigDateTime, ConfigClock, ConfigNumber, ConfigSelectionNumber, ConfigSelection, \
+	config, ConfigSubsection, ConfigSubList, ConfigSubDict, ConfigIP, ConfigSlider, ConfigDirectory, ConfigInteger
+from time import gmtime, strftime, localtime, mktime, time, sleep, mktime
+from datetime import datetime, timedelta 
+#############
+# Globals
+
+
+
+config.plugins.FanCtrl = ConfigSubsection()
+config.plugins.FanCtrl.FanMode = ConfigSelection(choices = {"0": _("Always ON"), "998": _("Always Off"), "1": _("Off in Standby"), "2": _("Cycle (5 Min ON ~ 5 Min Off)"), "999": _("Custom - Cycle")}, default="0")
+config.plugins.FanCtrl.FanON = ConfigSelection(choices = {"6": _("1min"), "30": _("5min"), "60": _("10min"), "90": _("15min"), "120": _("20min"), "150": _("25min"), "180": _("30min")}, default="60")
+config.plugins.FanCtrl.FanOff = ConfigSelection(choices = {"6": _("1min"), "30": _("5min"), "60": _("10min"), "90": _("15min"), "120": _("20min"), "150": _("25min"), "180": _("30min")}, default="60")
+
+
+
+class FanCtrlConfig(ConfigListScreen, Screen):
+  
+	skin = """
+		<screen position="center,center" size="320,225" title="FANSet v.2.1" >
+		<ePixmap pixmap="skin_default/buttons/red.png" position="10,180" size="140,40" transparent="1" alphatest="on" />
+		<ePixmap pixmap="skin_default/buttons/green.png" position="170,180" size="140,40" transparent="1" alphatest="on" />
+		<widget source="key_red" render="Label" position="10,180" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#9f1313" transparent="1" />
+		<widget source="key_green" render="Label" position="170,180" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#9f1313" transparent="1" />
+		<widget name="config" position="10,10" size="300,80" scrollbarMode="showOnDemand" />
+		<widget name="poraka" position="10,130" font="Regular;16" halign="center" size="300,50" />
+		</screen>"""
+
+	def __init__(self, session, args = None):
+		Screen.__init__(self, session)
+		self.session = session
+		self["poraka"] = Label(_("please setup fan control mode when the receiver is in Standby"))
+		self.list = []		
+		self["actions"] = ActionMap(["ChannelSelectBaseActions","WizardActions", "DirectionActions","MenuActions","NumberActions","ColorActions"],
+		{
+			"save": self.SaveCfg, 
+			"back": self.Izlaz, 
+			"ok": self.SaveCfg,
+			"green": self.SaveCfg,
+			"red": self.Izlaz,
+		}, -2)
+		self["key_red"] = StaticText(_("Exit"))
+		self["key_green"] = StaticText(_("Save Conf"))		
+		ConfigListScreen.__init__(self, self.list)
+		self.createSetup()
+		
+	def keyLeft(self):
+		ConfigListScreen.keyLeft(self)
+		self.createSetup()
+
+	def keyRight(self):
+		ConfigListScreen.keyRight(self)
+		self.createSetup()
+
+	def createSetup(self):
+		self.list = [ ]
+		self.list.append(getConfigListEntry(_("FAN:"), config.plugins.FanCtrl.FanMode))
+#
+		if config.plugins.FanCtrl.FanMode.value == "999":
+			self.list.append(getConfigListEntry(_("  ON:"), config.plugins.FanCtrl.FanON))
+			self.list.append(getConfigListEntry(_("  Off:"), config.plugins.FanCtrl.FanOff))
+		self["config"].list = self.list
+		self["config"].l.setList(self.list)
+
+	def SaveCfg(self):
+		if config.plugins.FanCtrl.FanOff.value == "": config.plugins.FanCtrl.FanOff.value = "*99#"
+		config.plugins.FanCtrl.FanMode.save()
+		config.plugins.FanCtrl.FanON.save()
+		config.plugins.FanCtrl.FanOff.save()
+		self.close()	
+
+	def Izlaz(self):
+		self.close()	
+#####################################################################
+
+class LoopSyncMain(ConfigListScreen, Screen):
+	def __init__(self, session, args = None):
+		Screen.__init__(self, session)
+		self.session = session
+		self.gotSession()
+
+	def gotSession(self):
+		self.FanState = 0
+		self.FOnTest = 0
+		self.FOffTest = 0
+		self.testno = 60
+		self.testRTCSet = 0
+		self.rstate = 1
+		self.recf = 0
+		self.ledstatus = 1
+		self.FANtimeTimer = eTimer()
+		self.LEDtimeTimer = eTimer()
+		self.RtimeTimer = eTimer()
+		hw_type = HardwareInfo().get_device_name()
+		if hw_type == "me" or hw_type == "minime" :
+			self.LEDtimeTimer.callback.append(self.updateLED)
+			self.RtimeTimer.callback.append(self.updateRT)
+		elif hw_type == 'elite' or hw_type == 'premium' or hw_type == 'premium+' or hw_type == 'ultra' :
+			self.LEDtimeTimer.callback.append(self.updateLEDHD)
+			self.RtimeTimer.callback.append(self.updateRTHD)
+		if hw_type == 'ultra' or hw_type == 'premium+':
+			self.FANtimeTimer.callback.append(self.updateFAN)
+		self.LEDtimeTimer.start(12000, True)
+		self.RtimeTimer.start(12000, True)
+		self.FANtimeTimer.start(12000, True)
+
+	def updateFAN(self):
+		oInd = config.plugins.FanCtrl.FanMode.value
+		if oInd == "998" and self.FanState == 0:
+			self.FanState = 1
+			try:
+				open("/proc/fan", "w").write("0")
+				print " ==>> Fan turned Off."
+				open("/proc/fan", "w").close()
+			except OSError:
+				print " ==>> Fan turned Off - failed."
+		if oInd == "999":
+			self.FanON = config.plugins.FanCtrl.FanON.value
+			self.FanOff = config.plugins.FanCtrl.FanOff.value		
+		else:
+			self.FanON = "5"
+			self.FanOff = "5"
+		if Screens.Standby.inStandby and oInd <> "0":
+			if oInd == "1" and self.FanState == 0:
+				self.FanState = 1
+				try:
+					open("/proc/fan", "w").write("0")
+					print " ==>> Fan turned Off."
+					open("/proc/fan", "w").close()
+				except OSError:
+					print " ==>> Fan turned Off - failed."
+			elif oInd <> "0" and oInd <> "1":
+				if self.FanState == 0:
+					self.FOnTest += 1
+					if self.FOnTest >= int(self.FanON):
+						self.FOnTest = 0
+						self.FanState = 1
+						try:
+							open("/proc/fan", "w").write("0")
+							print " ==>> Fan turned Off."
+							open("/proc/fan", "w").close()
+						except OSError:
+							print " ==>> Fan turned Off - failed."
+				else:
+					self.FOffTest += 1
+					if self.FOffTest >= int(self.FanOff):
+						self.FOffTest = 0
+						self.FanState = 0
+						try:
+							open("/proc/fan", "w").write("1")
+							print " ==>> Fan turned On."
+							open("/proc/fan", "w").close()
+						except OSError:
+							print " ==>> Fan turned On - failed."
+		else:
+			#if self.FanState == 1:
+			if oInd <> "998" and self.FanState == 1:
+				try:
+					open("/proc/fan", "w").write("1")
+					print " ==>> Fan turned On."
+					open("/proc/fan", "w").close()
+				except OSError:
+					print " ==>> Fan turned On - failed."
+				self.FanState = 0
+			self.FOnTest = int(self.FanON)
+			self.FOffTest = 0
+		self.FANtimeTimer.start(10000, True)
+
+#_______________________ Led & RTC/SystemTime ________________________
+
+	def updateRT(self):
+		if self.testRTCSet <> 0 : 
+			return
+		else:
+			if self.testno >= 60:
+				self.testno = 0
+				self.SetTime()
+			else:
+				self.testno += 1
+			self.RtimeTimer.start(10000, True)
+
+	def updateRTHD(self):
+		godina = int(datetime.utcnow().timetuple() [0])
+		if godina >= 2012 : 
+			return
+		else:
+			if self.testno >= 60:
+				self.testno = 0
+				self.SetTimeHD()
+			else:
+				self.testno += 1
+			self.RtimeTimer.start(10000, True)
+
+	def SetTimeHD(self):
+		plugin_path = "/usr/lib/enigma2/python/Plugins/SystemPlugins/RtiSYS"
+		cmd = str(plugin_path + "/ntpdate -t 20 0.debian.pool.ntp.org")
+		res = popen(cmd).read()
+		if res == "":
+			cmd = "ls -l %s%s" % (plugin_path, "/ntpdate")
+			res = popen(cmd).read()
+			if res[3]!="x":
+				cmd = "chmod 755 %s%s" % (plugin_path, "/ntpdate")
+				res = popen(cmd).read()
+				print "attributes for ntpdate have not been correct! Fixed now! Try again!"
+			else:
+				print "ntpdate problem: Internet connection ok? Time server ok?"
+		else:
+			print "NTP Update - DONE"
+
+	def SetTime(self):
+		TBefore = mktime(datetime.utcnow().timetuple())
+		plugin_path = "/usr/lib/enigma2/python/Plugins/SystemPlugins/RtiSYS"
+		cmd = str(plugin_path + "/ntpdate -t 20 0.debian.pool.ntp.org")
+		res = popen(cmd).read()
+		if res == "":
+			cmd = "ls -l %s%s" % (plugin_path, "/ntpdate")
+			res = popen(cmd).read()
+			if res[3]!="x":
+				cmd = "chmod 755 %s%s" % (plugin_path, "/ntpdate")
+				res = popen(cmd).read()
+				print "attributes for ntpdate have not been correct! Fixed now! Try again!"
+			else:
+				print "ntpdate problem: Internet connection ok? Time server ok?"
+		else:
+			print "NTP Update - DONE"
+			TAfter = mktime(datetime.utcnow().timetuple())
+			self.testRTCSet = 1
+			deviation = abs(TAfter - TBefore)
+			print "Deviation: " , deviation , "sec."
+			if deviation <= 60: return
+#-------------------------------------------
+			UTCTim = datetime.utcnow().timetuple()
+			godina = '0000' + str(UTCTim [0])
+			godina = godina [len(godina) - 4:]
+			mesec = '00' + str(UTCTim [1])
+			mesec = mesec [len(mesec) - 2:]
+			den = '00' + str(UTCTim [2])
+			den = den [len(den) - 2:]
+			saat = '00' + str(UTCTim [3])
+			saat = saat [len(saat) - 2:]
+			minuti = '00' + str(UTCTim [4])
+			minuti = minuti [len(minuti) - 2:]
+			sekundi = '00' + str(UTCTim [5])
+			sekundi = sekundi [len(sekundi) - 2:]
+			TimeString = godina + mesec + den + saat + minuti + sekundi
+			TimeZoneS = config.timezone.val.value
+			ipos1 = TimeZoneS.find("(GMT")
+			ipos2 = TimeZoneS.find(")")
+			tmp = TimeZoneS[ipos1+4:ipos2]
+			if len(tmp) == 0 : tmp = "+00"
+			tzpredznak = tmp[:1]
+			tzvalue = str(int(tmp[1:3]))
+			TimeString = TimeString + tzpredznak + tzvalue
+			import os
+			cmd = 'echo "' + str(TimeString) + '" > /proc/settime'
+			os.system(cmd)
+			print "RTC Update - DONE"
+
+	def updateLEDHD(self):
+		try:
+			line = len(self.session.nav.getRecordings())
+			if line == 1:
+				try:
+					os.system('echo "4" > /proc/led')
+				except:
+					pass
+			elif line == 0:
+				try:
+					os.system('echo "3" > /proc/led')
+				except:
+					pass
+		except:
+			try:
+				os.system('echo "3" > /proc/led')
+			except:
+				pass
+		if self.recf == 0:
+			self.recf = 1
+		else:
+			self.recf = 0
+			try:
+				os.system('echo "3" > /proc/led')
+			except:
+				pass
+		self.LEDtimeTimer.start(1000, True)
+
+	def updateLED(self):
+		try:
+			line = len(self.session.nav.getRecordings())
+			if line == 1:
+				if self.recf == 0:
+					try:
+						f = open("/proc/led", "r")
+						self.ledstatus = int(f.readline(), 16)
+					except:
+						self.ledstatus = 1
+				self.recf = 1
+				self.rstate += 1
+				if self.rstate > 2: self.rstate = 1
+				try:
+					os.system('echo "' + str(self.rstate) + '" > /proc/led')
+				except:
+					pass
+			else:
+				if self.recf == 1:
+					try:
+						os.system('echo "' + str(self.ledstatus) + '" > /proc/led')
+					except:
+						pass
+					self.recf = 0
+		except:
+			pass
+
+		self.LEDtimeTimer.start(1000, True)
+
+
+#loopsyncmain = LoopSyncMain()
+#####################################################################
+
+
+def FanCtrlMain(session, **kwargs):
+	session.open(FanCtrlConfig)
+
+def startSetup(menuid):
+	if menuid != "system":
+		return [ ]
+	return [(_("[Fan Set]") , FanCtrlMain, " FanCtrlSetupMain_setup", 9)]
+
+def sessionstart(session, **kwargs):
+	session.open(LoopSyncMain)
+
+
+def Plugins(**kwargs):
+	hw_type = HardwareInfo().get_device_name()
+	if hw_type == 'ultra' or hw_type == 'premium+' or hw_type == 'me':
+		return [
+			PluginDescriptor(name="FanCtrl", description="FAN Controll", where = PluginDescriptor.WHERE_MENU, fnc=startSetup),
+			PluginDescriptor(where=[PluginDescriptor.WHERE_SESSIONSTART], fnc=sessionstart)
+			]
+	else:
+		return [
+			PluginDescriptor(where=[PluginDescriptor.WHERE_SESSIONSTART], fnc=sessionstart)
+			]
