@@ -349,7 +349,7 @@ def sessionstart(session, **kwargs):
 
 def Plugins(**kwargs):
 	hw_type = HardwareInfo().get_device_name()
-	if hw_type == 'ultra' or hw_type == 'premium+' or hw_type == 'me':
+	if hw_type == 'ultra' or hw_type == 'premium+':
 		return [
 			PluginDescriptor(name="FanCtrl", description="FAN Controll", where = PluginDescriptor.WHERE_MENU, fnc=startSetup),
 			PluginDescriptor(where=[PluginDescriptor.WHERE_SESSIONSTART], fnc=sessionstart)
