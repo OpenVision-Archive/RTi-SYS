@@ -24,10 +24,12 @@ from datetime import datetime, timedelta
 
 
 
-config.plugins.FanCtrl = ConfigSubsection()
-config.plugins.FanCtrl.FanMode = ConfigSelection(choices = {"0": _("Always ON"), "998": _("Always Off"), "1": _("Off in Standby"), "2": _("Cycle (5 Min ON ~ 5 Min Off)"), "999": _("Custom - Cycle")}, default="0")
-config.plugins.FanCtrl.FanON = ConfigSelection(choices = {"6": _("1min"), "30": _("5min"), "60": _("10min"), "90": _("15min"), "120": _("20min"), "150": _("25min"), "180": _("30min")}, default="60")
-config.plugins.FanCtrl.FanOff = ConfigSelection(choices = {"6": _("1min"), "30": _("5min"), "60": _("10min"), "90": _("15min"), "120": _("20min"), "150": _("25min"), "180": _("30min")}, default="60")
+config.plugins.RtiSYS = ConfigSubsection()
+config.plugins.RtiSYS.FanMode = ConfigSelection(choices = {"0": _("Always ON"), "998": _("Always Off"), "1": _("Off in Standby"), "2": _("Cycle (5 Min ON ~ 5 Min Off)"), "999": _("Custom - Cycle")}, default="0")
+config.plugins.RtiSYS.FanON = ConfigSelection(choices = {"6": _("1min"), "30": _("5min"), "60": _("10min"), "90": _("15min"), "120": _("20min"), "150": _("25min"), "180": _("30min")}, default="60")
+config.plugins.RtiSYS.FanOff = ConfigSelection(choices = {"6": _("1min"), "30": _("5min"), "60": _("10min"), "90": _("15min"), "120": _("20min"), "150": _("25min"), "180": _("30min")}, default="60")
+config.plugins.RtiSYS.CRClock = ConfigSlider(default = 357,  increment = 1, limits = (300, 1600))
+config.plugins.RtiSYS.CRVoltage = ConfigSelection(choices = {"0": _("5V"), "1": _("3.3V")}, default="0")
 
 
 
@@ -71,19 +73,98 @@ class FanCtrlConfig(ConfigListScreen, Screen):
 
 	def createSetup(self):
 		self.list = [ ]
-		self.list.append(getConfigListEntry(_("FAN:"), config.plugins.FanCtrl.FanMode))
+		self.list.append(getConfigListEntry(_("FAN:"), config.plugins.RtiSYS.FanMode))
 #
-		if config.plugins.FanCtrl.FanMode.value == "999":
-			self.list.append(getConfigListEntry(_("  ON:"), config.plugins.FanCtrl.FanON))
-			self.list.append(getConfigListEntry(_("  Off:"), config.plugins.FanCtrl.FanOff))
+		if config.plugins.RtiSYS.FanMode.value == "999":
+			self.list.append(getConfigListEntry(_("  ON:"), config.plugins.RtiSYS.FanON))
+			self.list.append(getConfigListEntry(_("  Off:"), config.plugins.RtiSYS.FanOff))
 		self["config"].list = self.list
 		self["config"].l.setList(self.list)
 
 	def SaveCfg(self):
-		if config.plugins.FanCtrl.FanOff.value == "": config.plugins.FanCtrl.FanOff.value = "*99#"
-		config.plugins.FanCtrl.FanMode.save()
-		config.plugins.FanCtrl.FanON.save()
-		config.plugins.FanCtrl.FanOff.save()
+		if config.plugins.RtiSYS.FanOff.value == "": config.plugins.RtiSYS.FanOff.value = "*99#"
+		config.plugins.RtiSYS.FanMode.save()
+		config.plugins.RtiSYS.FanON.save()
+		config.plugins.RtiSYS.FanOff.save()
+		self.close()	
+
+	def Izlaz(self):
+		self.close()	
+#####################################################################
+
+class CRClock(ConfigListScreen, Screen):
+  
+	skin = """
+		<screen position="center,center" size="380,225" title="Card Reader Set v.1.0" >
+		<ePixmap pixmap="skin_default/buttons/red.png" position="10,180" size="140,40" transparent="1" alphatest="on" />
+		<ePixmap pixmap="skin_default/buttons/green.png" position="230,180" size="140,40" transparent="1" alphatest="on" />
+		<widget source="key_red" render="Label" position="10,180" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#9f1313" transparent="1" />
+		<widget source="key_green" render="Label" position="230,180" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#9f1313" transparent="1" />
+		<widget name="config" position="10,10" size="350,50" scrollbarMode="showOnDemand" />
+		<widget name="poraka" position="10,130" font="Regular;16" halign="center" size="360,50" />
+		</screen>"""
+
+	def __init__(self, session, args = None):
+		Screen.__init__(self, session)
+		self.session = session
+		self["poraka"] = Label(_("Please use ChUp, ChDown, Left, Right buttons to SetUp Card Reader Clock & Voltage."))
+		self.list = []		
+		self["actions"] = ActionMap(["ChannelSelectBaseActions","WizardActions", "DirectionActions","MenuActions","NumberActions","ColorActions"],
+		{
+			"save": self.SaveCfg, 
+			"back": self.Izlaz, 
+			"ok": self.SaveCfg,
+			"green": self.SaveCfg,
+			"red": self.Izlaz,
+			"nextBouquet": self.keyUp,
+			"prevBouquet": self.keyDwon,
+		}, -2)
+		self["key_red"] = StaticText(_("Exit"))
+		self["key_green"] = StaticText(_("Set Clock"))		
+		ConfigListScreen.__init__(self, self.list)
+		self.createSetup()
+		
+	def keyLeft(self):
+		ConfigListScreen.keyLeft(self)
+		self.createSetup()
+
+	def keyRight(self):
+		ConfigListScreen.keyRight(self)
+		self.createSetup()
+
+	def keyUp(self):
+		config.plugins.RtiSYS.CRClock.value = config.plugins.RtiSYS.CRClock.value + 9
+		ConfigListScreen.keyRight(self)
+		self.createSetup()
+
+	def keyDwon(self):
+		config.plugins.RtiSYS.CRClock.value = config.plugins.RtiSYS.CRClock.value - 9
+		ConfigListScreen.keyLeft(self)
+		self.createSetup()
+
+	def createSetup(self):
+		self.list = [ ]
+		clockstr = str(config.plugins.RtiSYS.CRClock.value) + "MHz"
+		self.list.append(getConfigListEntry(_("CR Clock   : " + clockstr), config.plugins.RtiSYS.CRClock))
+		self.list.append(getConfigListEntry(_("CR Voltage:"), config.plugins.RtiSYS.CRVoltage))
+		self["config"].list = self.list
+		self["config"].l.setList(self.list)
+
+	def SaveCfg(self):
+		config.plugins.RtiSYS.CRClock.save()
+		config.plugins.RtiSYS.CRVoltage.save()
+		try:
+			open("/proc/sc_clock", "w").write(str(config.plugins.RtiSYS.CRClock.value))
+			print " ==>> Set CRClock."
+			open("/proc/sc_clock", "w").close()
+		except IOError:
+			print " ==>> Set CRClock - failed."
+		try:
+			open("/proc/sc_35v", "w").write(str(config.plugins.RtiSYS.CRVoltage.value))
+			print " ==>> Set CRVoltage."
+			open("/proc/sc_35v", "w").close()
+		except IOError:
+			print " ==>> Set CRVoltage - failed."
 		self.close()	
 
 	def Izlaz(self):
@@ -122,7 +203,7 @@ class LoopSyncMain(ConfigListScreen, Screen):
 		self.FANtimeTimer.start(12000, True)
 
 	def updateFAN(self):
-		oInd = config.plugins.FanCtrl.FanMode.value
+		oInd = config.plugins.RtiSYS.FanMode.value
 		if oInd == "998" and self.FanState == 0:
 			self.FanState = 1
 			try:
@@ -132,8 +213,8 @@ class LoopSyncMain(ConfigListScreen, Screen):
 			except OSError:
 				print " ==>> Fan turned Off - failed."
 		if oInd == "999":
-			self.FanON = config.plugins.FanCtrl.FanON.value
-			self.FanOff = config.plugins.FanCtrl.FanOff.value		
+			self.FanON = config.plugins.RtiSYS.FanON.value
+			self.FanOff = config.plugins.RtiSYS.FanOff.value		
 		else:
 			self.FanON = "5"
 			self.FanOff = "5"
@@ -338,10 +419,18 @@ class LoopSyncMain(ConfigListScreen, Screen):
 def FanCtrlMain(session, **kwargs):
 	session.open(FanCtrlConfig)
 
+def CRClockMain(session, **kwargs):
+	session.open(CRClock)
+
 def startSetup(menuid):
 	if menuid != "system":
 		return [ ]
 	return [(_("[Fan Set]") , FanCtrlMain, " FanCtrlSetupMain_setup", 9)]
+
+def startSetup1(menuid):
+	if menuid != "system":
+		return [ ]
+	return [(_("[Card Reader Set]") , CRClockMain, " CRClock_setup", 9)]
 
 def sessionstart(session, **kwargs):
 	session.open(LoopSyncMain)
@@ -352,6 +441,11 @@ def Plugins(**kwargs):
 	if hw_type == 'ultra' or hw_type == 'premium+':
 		return [
 			PluginDescriptor(name="FanCtrl", description="FAN Controll", where = PluginDescriptor.WHERE_MENU, fnc=startSetup),
+			PluginDescriptor(where=[PluginDescriptor.WHERE_SESSIONSTART], fnc=sessionstart)
+			]
+	elif hw_type == 'minime':
+		return [
+			PluginDescriptor(name="FanCtrl", description="FAN Controll", where = PluginDescriptor.WHERE_MENU, fnc=startSetup1),
 			PluginDescriptor(where=[PluginDescriptor.WHERE_SESSIONSTART], fnc=sessionstart)
 			]
 	else:
