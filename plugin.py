@@ -189,10 +189,13 @@ class LoopSyncMain(ConfigListScreen, Screen):
 		self.FANtimeTimer = eTimer()
 		self.LEDtimeTimer = eTimer()
 		self.RtimeTimer = eTimer()
+		self.RtiminimeTimer = eTimer()
 		hw_type = HardwareInfo().get_device_name()
 		if hw_type == "me" or hw_type == "minime" :
 			self.LEDtimeTimer.callback.append(self.updateLED)
 			self.RtimeTimer.callback.append(self.updateRT)
+			if hw_type == "minime" :
+				self.RtiminimeTimer.callback.append(self.updateCR)
 		elif hw_type == 'elite' or hw_type == 'premium' or hw_type == 'premium+' or hw_type == 'ultra' :
 			self.LEDtimeTimer.callback.append(self.updateLEDHD)
 			self.RtimeTimer.callback.append(self.updateRTHD)
@@ -201,6 +204,7 @@ class LoopSyncMain(ConfigListScreen, Screen):
 		self.LEDtimeTimer.start(12000, True)
 		self.RtimeTimer.start(12000, True)
 		self.FANtimeTimer.start(12000, True)
+		self.RtiminimeTimer.start(12000, True)
 
 	def updateFAN(self):
 		oInd = config.plugins.RtiSYS.FanMode.value
@@ -264,6 +268,24 @@ class LoopSyncMain(ConfigListScreen, Screen):
 			self.FOffTest = 0
 		self.FANtimeTimer.start(10000, True)
 
+#_______________________ CR Clock & Voltage ________________________
+
+	def updateCR(self):
+		try:
+			strCRClock = str(config.plugins.RtiSYS.CRClock.value)
+			open("/proc/sc_clock", "w").write(strCRClock)
+			print " ==>> Set CRClock : " , strCRClock
+			open("/proc/sc_clock", "w").close()
+		except IOError:
+			print " ==>> Set CRClock - failed."
+		try:
+			strCRVoltage = str(config.plugins.RtiSYS.CRVoltage.value)
+			open("/proc/sc_35v", "w").write(str(config.plugins.RtiSYS.CRVoltage.value))
+			print " ==>> Set CRVoltage : ", strCRVoltage
+			open("/proc/sc_35v", "w").close()
+		except IOError:
+			print " ==>> Set CRVoltage - failed."
+		self.close()	
 #_______________________ Led & RTC/SystemTime ________________________
 
 	def updateRT(self):
