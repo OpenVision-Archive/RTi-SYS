@@ -285,7 +285,7 @@ class LoopSyncMain(ConfigListScreen, Screen):
 			open("/proc/sc_35v", "w").close()
 		except IOError:
 			print " ==>> Set CRVoltage - failed."
-		self.close()	
+		return	
 #_______________________ Led & RTC/SystemTime ________________________
 
 	def updateRT(self):
