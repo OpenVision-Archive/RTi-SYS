@@ -30,6 +30,10 @@ config.plugins.RtiSYS.FanON = ConfigSelection(choices = {"6": _("1min"), "30": _
 config.plugins.RtiSYS.FanOff = ConfigSelection(choices = {"6": _("1min"), "30": _("5min"), "60": _("10min"), "90": _("15min"), "120": _("20min"), "150": _("25min"), "180": _("30min")}, default="60")
 config.plugins.RtiSYS.CRClock = ConfigSlider(default = 357,  increment = 1, limits = (300, 1600))
 config.plugins.RtiSYS.CRVoltage = ConfigSelection(choices = {"0": _("5V"), "1": _("3.3V")}, default="0")
+config.plugins.RtiSYS.ScanMode = ConfigSelection(choices = {"1": _("Source"), "2": _("Progressive"), "3": _("Interlaced_TopFieldFirst"), "4": _("Interlaced_BotFieldFirst")}, default="1")
+config.plugins.RtiSYS.Interlaced = ConfigSelection(choices = {"1": _("DECODER_SPECIFICATION"), "2": _("MPEG2_PROGRESSIVE_SEQ"), "3": _("MPEG2_MENU_PROGRESSIVE")}, default="1")
+#config.plugins.RtiSYS.DeinterlacingMode = ConfigSelection(choices = {"1": _("Discard_Bob"), "2": _("Weave"), "3": _("ConstantBlend"), "4": _("MotionAdaptative")}, default="1")
+config.plugins.RtiSYS.DeinterlacingMode = ConfigSelection(choices = {"1": _("Discard_Bob"), "2": _("Weave"), "3": _("ConstantBlend")}, default="1")
 
 
 
@@ -157,14 +161,127 @@ class CRClock(ConfigListScreen, Screen):
 			open("/proc/sc_clock", "w").write(str(config.plugins.RtiSYS.CRClock.value))
 			print " ==>> Set CRClock."
 			open("/proc/sc_clock", "w").close()
-		except IOError:
-			print " ==>> Set CRClock - failed."
+		except Exception, e:
+			print e
 		try:
 			open("/proc/sc_35v", "w").write(str(config.plugins.RtiSYS.CRVoltage.value))
 			print " ==>> Set CRVoltage."
 			open("/proc/sc_35v", "w").close()
-		except IOError:
-			print " ==>> Set CRVoltage - failed."
+		except Exception, e:
+			print e
+		self.close()	
+
+	def Izlaz(self):
+		self.close()	
+#####################################################################
+
+class AVpSet(ConfigListScreen, Screen):
+  
+	skin = """
+		<screen position="center,center" size="760,395" title="A/V settings + v.1.0" >
+		<ePixmap pixmap="skin_default/buttons/red.png" position="10,350" size="140,40" transparent="1" alphatest="on" />
+		<ePixmap pixmap="skin_default/buttons/green.png" position="610,350" size="140,40" transparent="1" alphatest="on" />
+		<widget source="key_red" render="Label" position="10,350" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#9f1313" transparent="1" />
+		<widget source="key_green" render="Label" position="610,350" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#9f1313" transparent="1" />
+		<widget name="config" position="10,10" size="740,75" scrollbarMode="showOnDemand" />
+		<widget name="poraka" position="10,150" font="Regular;16" halign="center" valign="center" foregroundColor="#ffff00" size="740,54" />
+		<widget name="poraka1" position="10,210" font="Regular;16" halign="center" valign="center" foregroundColor="#ff2222" size="740,130" />
+		</screen>"""
+
+	def __init__(self, session, args = None):
+		Screen.__init__(self, session)
+		self.session = session
+		self["poraka"] = Label(_("."))
+		self["poraka1"] = Label(_("."))
+		self.list = []		
+		self["actions"] = ActionMap(["ChannelSelectBaseActions","WizardActions", "DirectionActions","MenuActions","NumberActions","ColorActions"],
+		{
+			"save": self.SaveCfg, 
+			"back": self.Izlaz, 
+			"ok": self.SaveCfg,
+			"green": self.SaveCfg,
+			"red": self.Izlaz,
+			"down": self.keyUp,
+			"up": self.keyDwon,
+		}, -2)
+		self["key_red"] = StaticText(_("Exit"))
+		self["key_green"] = StaticText(_("Save"))		
+		ConfigListScreen.__init__(self, self.list)
+		self.createSetup()
+		
+	def keyLeft(self):
+		ConfigListScreen.keyLeft(self)
+		self.createSetup()
+
+	def keyRight(self):
+		ConfigListScreen.keyRight(self)
+		self.createSetup()
+
+	def keyUp(self):
+		self["config"].setCurrentIndex(self["config"].getCurrentIndex() + 1)
+		self.createSetup()
+
+	def keyDwon(self):
+		self["config"].setCurrentIndex(self["config"].getCurrentIndex() - 1)
+		self.createSetup()
+
+	def createSetup(self):
+		expl = ""
+		self.list = [ ]
+		self.list.append(getConfigListEntry(_("Scan Mode   : "), config.plugins.RtiSYS.ScanMode))
+		self.list.append(getConfigListEntry(_("Interlaced Algo:"), config.plugins.RtiSYS.Interlaced))
+		self.list.append(getConfigListEntry(_("Deinterlacing Mode:"), config.plugins.RtiSYS.DeinterlacingMode))
+		self["config"].list = self.list
+		self["config"].l.setList(self.list)
+		ind = self["config"].getCurrentIndex()
+		if ind == 0 :
+			self["poraka"].setText("The set property allows an application to force the decoder to mark the pictures in a certain way, including forcing progressive, and forcing interlaced bottom first or top first.")
+			el = str(config.plugins.RtiSYS.ScanMode.value)
+			if el == "1": expl = "EMhwlibScanMode_Source  Use the information given by the video decoder (default)."
+			if el == "2": expl = "EMhwlibScanMode_Progressive  Forces the input to be progressive."
+			if el == "3": expl = "EMhwlibScanMode_Interlaced_TopFieldFirst  Forces the input to be interlaced top field first."
+			if el == "4": expl = "EMhwlibScanMode_Interlaced_BotFieldFirst  Forces the input to be interlaced bottom field first."
+		elif ind == 1 :
+			self["poraka"].setText("The set property allows an application to force a preferred interlace or progressive algorithm in case of unsure output format (usually stream).")
+			el = str(config.plugins.RtiSYS.Interlaced.value)
+			if el == "1": expl = "INTERLACED_PROGRESSIVE_ALGORITHM_USING_DECODER_SPECIFICATION  Use the decoder defined method (default)."
+			if el == "2": expl = "INTERLACED_PROGRESSIVE_ALGORITHM_USING_MPEG2_PROGRESSIVE_SEQ  When the extended sequence header is defined as progressive and the picture header says otherwise, force the sequence to be progressive."
+			if el == "3": expl = "INTERLACED_PROGRESSIVE_ALGORITHM_USING_MPEG2_MENU_PROGRESSIVE  When playing a DVD menu stream, this flags forces the decoder to make decoded pictures progressive to make displayed images stable. Only valid for MPEG-2 streams."
+		elif ind == 2 :
+			self["poraka"].setText("The set property allows an application to select the scaler's deinterlacing mode. Deinterlacing is used only when the scaler's input pictures are interlaced. If the scaler is set to deinterlacing but the input is progressive, then the scaler will not use any deinterlacing.")
+			el = str(config.plugins.RtiSYS.DeinterlacingMode.value)
+			if el == "1": expl = "No deinterlacing is used. At each instance, only one field is taken from the source to generate the output picture. This can result in half the vertical resolution on the display."
+			if el == "2": expl = "Weave deinterlacing is used. This is the opposite of Bob deinterlacing where the complete input frame is used each time. There is no problem with half resolution, but in the case of motion between the two fields, the result is very bad."
+			if el == "3": expl = "This is a slightly different form of EMhwlibDeinterlacingMode_Weave where a weight is applied on each field in order to diminish the motion's artifacts."
+			if el == "4": expl = "Both Weave and Bob deinterlacing are used. Two scalers are used, one to compute the movement between field N-1 and N+1, and the other to generate a Weave N frame from field N-1 and field N+1. The other scaler applies a Bob algorithm on field N to generate the frame N. Finally, the two frames are mixed, with an alpha modulated by the movement detection. In the areas where no motion or little motion is detected, the Weave frame N is used, but in case of motion the Bob frame is used. Finally, the alpha can be also statically modified (on top of movement detection) with two weight factors to increase the Weave or Bob weight in the final frame."
+		self["poraka1"].setText(expl)
+		self.ActCfg()	
+
+	def ActCfg(self):
+		try:
+			open("/proc/input_scan_mode", "w").write(str(config.plugins.RtiSYS.ScanMode.value))
+			print " ==>> Set input_scan_mode."
+			open("/proc/input_scan_mode", "w").close()
+		except Exception, e:
+			print e
+		try:
+			open("/proc/interlaced_algo", "w").write(str(config.plugins.RtiSYS.Interlaced.value))
+			print " ==>> Set Interlaced Algo."
+			open("/proc/interlaced_algo", "w").close()
+		except Exception, e:
+			print e
+		try:
+			open("/proc/deinterlace_mode", "w").write(str(config.plugins.RtiSYS.DeinterlacingMode.value))
+			print " ==>> Set Deinterlace Mode."
+			open("/proc/deinterlace_mode", "w").close()
+		except Exception, e:
+			print e
+
+	def SaveCfg(self):
+		config.plugins.RtiSYS.ScanMode.save()
+		config.plugins.RtiSYS.Interlaced.save()
+		config.plugins.RtiSYS.DeinterlacingMode.save()
+		self.ActCfg()	
 		self.close()	
 
 	def Izlaz(self):
@@ -190,6 +307,7 @@ class LoopSyncMain(ConfigListScreen, Screen):
 		self.LEDtimeTimer = eTimer()
 		self.RtimeTimer = eTimer()
 		self.RtiminimeTimer = eTimer()
+		self.AVptimeTimer = eTimer()
 		hw_type = HardwareInfo().get_device_name()
 		if hw_type == "me" or hw_type == "minime" :
 			self.LEDtimeTimer.callback.append(self.updateLED)
@@ -201,11 +319,37 @@ class LoopSyncMain(ConfigListScreen, Screen):
 			self.RtimeTimer.callback.append(self.updateRTHD)
 		if hw_type == 'ultra' or hw_type == 'premium+':
 			self.FANtimeTimer.callback.append(self.updateFAN)
+		self.AVptimeTimer.callback.append(self.updateAVp)
 		self.LEDtimeTimer.start(12000, True)
 		self.RtimeTimer.start(12000, True)
 		self.FANtimeTimer.start(12000, True)
 		self.RtiminimeTimer.start(12000, True)
+		self.AVptimeTimer.start(12000, True)
 
+#_______________________ AVplus ________________________
+	def updateAVp(self):
+		try:
+			strScan_mode = str(config.plugins.RtiSYS.ScanMode.value)
+			open("/proc/input_scan_mode", "w").write(strScan_mode)
+			print " ==>> Set input_scan_mode."
+			open("/proc/input_scan_mode", "w").close()
+		except Exception, e:
+			print e
+		try:
+			strInterlaced_algo = str(config.plugins.RtiSYS.Interlaced.value)
+			open("/proc/interlaced_algo", "w").write(strInterlaced_algo)
+			print " ==>> Set Interlaced Algo."
+			open("/proc/interlaced_algo", "w").close()
+		except Exception, e:
+			print e
+		try:
+			strDeinterlace_mode = str(config.plugins.RtiSYS.DeinterlacingMode.value)
+			open("/proc/deinterlace_mode", "w").write(strDeinterlace_mode)
+			print " ==>> Set Deinterlace Mode."
+			open("/proc/deinterlace_mode", "w").close()
+		except Exception, e:
+			print e
+#_______________________ FAN ________________________
 	def updateFAN(self):
 		oInd = config.plugins.RtiSYS.FanMode.value
 		if oInd == "998" and self.FanState == 0:
@@ -276,15 +420,15 @@ class LoopSyncMain(ConfigListScreen, Screen):
 			open("/proc/sc_clock", "w").write(strCRClock)
 			print " ==>> Set CRClock : " , strCRClock
 			open("/proc/sc_clock", "w").close()
-		except IOError:
-			print " ==>> Set CRClock - failed."
+		except Exception, e:
+			print e
 		try:
 			strCRVoltage = str(config.plugins.RtiSYS.CRVoltage.value)
 			open("/proc/sc_35v", "w").write(str(config.plugins.RtiSYS.CRVoltage.value))
 			print " ==>> Set CRVoltage : ", strCRVoltage
 			open("/proc/sc_35v", "w").close()
-		except IOError:
-			print " ==>> Set CRVoltage - failed."
+		except Exception, e:
+			print e
 		return	
 #_______________________ Led & RTC/SystemTime ________________________
 
@@ -444,6 +588,9 @@ def FanCtrlMain(session, **kwargs):
 def CRClockMain(session, **kwargs):
 	session.open(CRClock)
 
+def AVpSetMain(session, **kwargs):
+	session.open(AVpSet)
+
 def startSetup(menuid):
 	if menuid != "system":
 		return [ ]
@@ -454,6 +601,11 @@ def startSetup1(menuid):
 		return [ ]
 	return [(_("[Card Reader Set]") , CRClockMain, " CRClock_setup", 9)]
 
+def startSetup2(menuid):
+	if menuid != "system":
+		return [ ]
+	return [(_("[A/V settings +]") , AVpSetMain, " AVp_setup", 9)]
+
 def sessionstart(session, **kwargs):
 	session.open(LoopSyncMain)
 
@@ -463,14 +615,17 @@ def Plugins(**kwargs):
 	if hw_type == 'ultra' or hw_type == 'premium+':
 		return [
 			PluginDescriptor(name="FanCtrl", description="FAN Controll", where = PluginDescriptor.WHERE_MENU, fnc=startSetup),
+			PluginDescriptor(name="AVp_setup", description="scan mode & interlaced algo", where = PluginDescriptor.WHERE_MENU, fnc=startSetup2),
 			PluginDescriptor(where=[PluginDescriptor.WHERE_SESSIONSTART], fnc=sessionstart)
 			]
 	elif hw_type == 'minime':
 		return [
-			PluginDescriptor(name="FanCtrl", description="FAN Controll", where = PluginDescriptor.WHERE_MENU, fnc=startSetup1),
+			PluginDescriptor(name="CRClock_setup", description="CR set freq", where = PluginDescriptor.WHERE_MENU, fnc=startSetup1),
+			PluginDescriptor(name="AVp_setup", description="scan mode & interlaced algo", where = PluginDescriptor.WHERE_MENU, fnc=startSetup2),
 			PluginDescriptor(where=[PluginDescriptor.WHERE_SESSIONSTART], fnc=sessionstart)
 			]
 	else:
 		return [
+			PluginDescriptor(name="AVp_setup", description="scan mode & interlaced algo", where = PluginDescriptor.WHERE_MENU, fnc=startSetup2),
 			PluginDescriptor(where=[PluginDescriptor.WHERE_SESSIONSTART], fnc=sessionstart)
 			]
