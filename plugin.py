@@ -311,14 +311,13 @@ class LoopSyncMain(ConfigListScreen, Screen):
 		hw_type = HardwareInfo().get_device_name()
 		if hw_type == "me" or hw_type == "minime" :
 			self.LEDtimeTimer.callback.append(self.updateLED)
-			self.RtimeTimer.callback.append(self.updateRT)
 			if hw_type == "minime" :
 				self.RtiminimeTimer.callback.append(self.updateCR)
 		elif hw_type == 'elite' or hw_type == 'premium' or hw_type == 'premium+' or hw_type == 'ultra' :
 			self.LEDtimeTimer.callback.append(self.updateLEDHD)
-			self.RtimeTimer.callback.append(self.updateRTHD)
 		if hw_type == 'ultra' or hw_type == 'premium+':
 			self.FANtimeTimer.callback.append(self.updateFAN)
+		self.RtimeTimer.callback.append(self.updateRT)
 		self.AVptimeTimer.callback.append(self.updateAVp)
 		self.LEDtimeTimer.start(12000, True)
 		self.RtimeTimer.start(12000, True)
@@ -433,7 +432,11 @@ class LoopSyncMain(ConfigListScreen, Screen):
 #_______________________ Led & RTC/SystemTime ________________________
 
 	def updateRT(self):
+		hw_type = HardwareInfo().get_device_name()
+		godina = int(datetime.utcnow().timetuple() [0])
 		if self.testRTCSet <> 0 : 
+			return
+		if godina >= 2012 : 
 			return
 		else:
 			if self.testno >= 60:
@@ -443,38 +446,11 @@ class LoopSyncMain(ConfigListScreen, Screen):
 				self.testno += 1
 			self.RtimeTimer.start(10000, True)
 
-	def updateRTHD(self):
-		godina = int(datetime.utcnow().timetuple() [0])
-		if godina >= 2012 : 
-			return
-		else:
-			if self.testno >= 60:
-				self.testno = 0
-				self.SetTimeHD()
-			else:
-				self.testno += 1
-			self.RtimeTimer.start(10000, True)
-
-	def SetTimeHD(self):
-		plugin_path = "/usr/lib/enigma2/python/Plugins/SystemPlugins/RtiSYS"
-		cmd = str(plugin_path + "/ntpdate -t 20 0.debian.pool.ntp.org")
-		res = popen(cmd).read()
-		if res == "":
-			cmd = "ls -l %s%s" % (plugin_path, "/ntpdate")
-			res = popen(cmd).read()
-			if res[3]!="x":
-				cmd = "chmod 755 %s%s" % (plugin_path, "/ntpdate")
-				res = popen(cmd).read()
-				print "attributes for ntpdate have not been correct! Fixed now! Try again!"
-			else:
-				print "ntpdate problem: Internet connection ok? Time server ok?"
-		else:
-			print "NTP Update - DONE"
-
 	def SetTime(self):
+		hw_type = HardwareInfo().get_device_name()
 		TBefore = mktime(datetime.utcnow().timetuple())
 		plugin_path = "/usr/lib/enigma2/python/Plugins/SystemPlugins/RtiSYS"
-		cmd = str(plugin_path + "/ntpdate -t 20 0.debian.pool.ntp.org")
+		cmd = str(plugin_path + "/ntpdate 0.debian.pool.ntp.org")
 		res = popen(cmd).read()
 		if res == "":
 			cmd = "ls -l %s%s" % (plugin_path, "/ntpdate")
@@ -487,6 +463,7 @@ class LoopSyncMain(ConfigListScreen, Screen):
 				print "ntpdate problem: Internet connection ok? Time server ok?"
 		else:
 			print "NTP Update - DONE"
+			if hw_type == 'elite' or hw_type == 'premium' or hw_type == 'premium+' or hw_type == 'ultra' : return
 			TAfter = mktime(datetime.utcnow().timetuple())
 			self.testRTCSet = 1
 			deviation = abs(TAfter - TBefore)
