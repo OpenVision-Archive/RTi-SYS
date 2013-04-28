@@ -449,53 +449,41 @@ class LoopSyncMain(ConfigListScreen, Screen):
 	def SetTime(self):
 		hw_type = HardwareInfo().get_device_name()
 		TBefore = mktime(datetime.utcnow().timetuple())
-		plugin_path = "/usr/lib/enigma2/python/Plugins/SystemPlugins/RtiSYS"
 		cmd = str("ntpdate 0.debian.pool.ntp.org")
-		res = popen(cmd).read()
-		if res == "":
-			cmd = "ls -l %s" % ("ntpdate")
-			res = popen(cmd).read()
-			if res[3]!="x":
-				cmd = "chmod 755 %s" % ("ntpdate")
-				res = popen(cmd).read()
-				print "attributes for ntpdate have not been correct! Fixed now! Try again!"
-			else:
-				print "ntpdate problem: Internet connection ok? Time server ok?"
-		else:
-			print "NTP Update - DONE"
-			if hw_type == 'elite' or hw_type == 'premium' or hw_type == 'premium+' or hw_type == 'ultra' : return
-			TAfter = mktime(datetime.utcnow().timetuple())
-			self.testRTCSet = 1
-			deviation = abs(TAfter - TBefore)
-			print "Deviation: " , deviation , "sec."
-			if deviation <= 60: return
+		print "NTP Update - DONE"
+		if hw_type == 'elite' or hw_type == 'premium' or hw_type == 'premium+' or hw_type == 'ultra' : return
+		TAfter = mktime(datetime.utcnow().timetuple())
+		self.testRTCSet = 1
+		deviation = abs(TAfter - TBefore)
+		print "Deviation: " , deviation , "sec."
+		if deviation <= 60: return
 #-------------------------------------------
-			UTCTim = datetime.utcnow().timetuple()
-			godina = '0000' + str(UTCTim [0])
-			godina = godina [len(godina) - 4:]
-			mesec = '00' + str(UTCTim [1])
-			mesec = mesec [len(mesec) - 2:]
-			den = '00' + str(UTCTim [2])
-			den = den [len(den) - 2:]
-			saat = '00' + str(UTCTim [3])
-			saat = saat [len(saat) - 2:]
-			minuti = '00' + str(UTCTim [4])
-			minuti = minuti [len(minuti) - 2:]
-			sekundi = '00' + str(UTCTim [5])
-			sekundi = sekundi [len(sekundi) - 2:]
-			TimeString = godina + mesec + den + saat + minuti + sekundi
-			TimeZoneS = config.timezone.val.value
-			ipos1 = TimeZoneS.find("(GMT")
-			ipos2 = TimeZoneS.find(")")
-			tmp = TimeZoneS[ipos1+4:ipos2]
-			if len(tmp) == 0 : tmp = "+00"
-			tzpredznak = tmp[:1]
-			tzvalue = str(int(tmp[1:3]))
-			TimeString = TimeString + tzpredznak + tzvalue
-			import os
-			cmd = 'echo "' + str(TimeString) + '" > /proc/settime'
-			os.system(cmd)
-			print "RTC Update - DONE"
+		UTCTim = datetime.utcnow().timetuple()
+		godina = '0000' + str(UTCTim [0])
+		godina = godina [len(godina) - 4:]
+		mesec = '00' + str(UTCTim [1])
+		mesec = mesec [len(mesec) - 2:]
+		den = '00' + str(UTCTim [2])
+		den = den [len(den) - 2:]
+		saat = '00' + str(UTCTim [3])
+		saat = saat [len(saat) - 2:]
+		minuti = '00' + str(UTCTim [4])
+		minuti = minuti [len(minuti) - 2:]
+		sekundi = '00' + str(UTCTim [5])
+		sekundi = sekundi [len(sekundi) - 2:]
+		TimeString = godina + mesec + den + saat + minuti + sekundi
+		TimeZoneS = config.timezone.val.value
+		ipos1 = TimeZoneS.find("(GMT")
+		ipos2 = TimeZoneS.find(")")
+		tmp = TimeZoneS[ipos1+4:ipos2]
+		if len(tmp) == 0 : tmp = "+00"
+		tzpredznak = tmp[:1]
+		tzvalue = str(int(tmp[1:3]))
+		TimeString = TimeString + tzpredznak + tzvalue
+		import os
+		cmd = 'echo "' + str(TimeString) + '" > /proc/settime'
+		os.system(cmd)
+		print "RTC Update - DONE"
 
 	def updateLEDHD(self):
 		try:
