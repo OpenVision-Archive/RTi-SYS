@@ -1,4 +1,4 @@
-RtiSYS
+RTi-SYS
 ======
 
-OpenAZBoxMOD Enigma2 RtiSYS plugin
+RTi-SYS enigma2 plugin for Open AZBox project 
