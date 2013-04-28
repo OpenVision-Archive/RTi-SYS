@@ -450,13 +450,13 @@ class LoopSyncMain(ConfigListScreen, Screen):
 		hw_type = HardwareInfo().get_device_name()
 		TBefore = mktime(datetime.utcnow().timetuple())
 		plugin_path = "/usr/lib/enigma2/python/Plugins/SystemPlugins/RtiSYS"
-		cmd = str(plugin_path + "/ntpdate 0.debian.pool.ntp.org")
+		cmd = str("ntpdate 0.debian.pool.ntp.org")
 		res = popen(cmd).read()
 		if res == "":
-			cmd = "ls -l %s%s" % (plugin_path, "/ntpdate")
+			cmd = "ls -l %s%s" % ("ntpdate")
 			res = popen(cmd).read()
 			if res[3]!="x":
-				cmd = "chmod 755 %s%s" % (plugin_path, "/ntpdate")
+				cmd = "chmod 755 %s%s" % ("ntpdate")
 				res = popen(cmd).read()
 				print "attributes for ntpdate have not been correct! Fixed now! Try again!"
 			else:
