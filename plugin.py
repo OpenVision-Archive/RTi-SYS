@@ -453,10 +453,10 @@ class LoopSyncMain(ConfigListScreen, Screen):
 		cmd = str("ntpdate 0.debian.pool.ntp.org")
 		res = popen(cmd).read()
 		if res == "":
-			cmd = "ls -l %s%s" % ("ntpdate")
+			cmd = "ls -l %s" % ("ntpdate")
 			res = popen(cmd).read()
 			if res[3]!="x":
-				cmd = "chmod 755 %s%s" % ("ntpdate")
+				cmd = "chmod 755 %s" % ("ntpdate")
 				res = popen(cmd).read()
 				print "attributes for ntpdate have not been correct! Fixed now! Try again!"
 			else:
