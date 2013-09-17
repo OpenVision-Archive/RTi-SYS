@@ -6,12 +6,10 @@ from Components.Sources.StaticText import StaticText
 from Screens.Screen import Screen
 from os import popen
 from enigma import eTimer
-#
 from Components.Sources.List import List
 from Tools.HardwareInfo import HardwareInfo
 import os
 from Components.Pixmap import Pixmap
-#
 import Screens.InfoBar
 from enigma import *
 from Components.config import configfile, getConfigListEntry, ConfigEnableDisable, \
@@ -21,7 +19,6 @@ from time import gmtime, strftime, localtime, mktime, time, sleep, mktime
 from datetime import datetime, timedelta 
 #############
 # Globals
-
 
 
 config.plugins.RtiSYS = ConfigSubsection()
@@ -34,7 +31,6 @@ config.plugins.RtiSYS.ScanMode = ConfigSelection(choices = {"1": _("Source"), "2
 config.plugins.RtiSYS.Interlaced = ConfigSelection(choices = {"1": _("DECODER_SPECIFICATION"), "2": _("MPEG2_PROGRESSIVE_SEQ"), "3": _("MPEG2_MENU_PROGRESSIVE")}, default="1")
 #config.plugins.RtiSYS.DeinterlacingMode = ConfigSelection(choices = {"1": _("Discard_Bob"), "2": _("Weave"), "3": _("ConstantBlend"), "4": _("MotionAdaptative")}, default="1")
 config.plugins.RtiSYS.DeinterlacingMode = ConfigSelection(choices = {"1": _("Discard_Bob"), "2": _("Weave"), "3": _("ConstantBlend")}, default="1")
-
 
 
 class FanCtrlConfig(ConfigListScreen, Screen):
