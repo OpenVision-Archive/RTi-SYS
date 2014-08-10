@@ -573,13 +573,13 @@ def sessionstart(session, **kwargs):
 
 def Plugins(**kwargs):
 	hw_type = HardwareInfo().get_device_name()
-	if hw_type == 'ultra' or hw_type == 'premium+':
+	if hw_type == 'azboxhd':
 		return [
 			PluginDescriptor(name="FanCtrl", description="FAN Controll", where = PluginDescriptor.WHERE_MENU, fnc=startSetup),
 			PluginDescriptor(name="AVp_setup", description="scan mode & interlaced algo", where = PluginDescriptor.WHERE_MENU, fnc=startSetup2),
 			PluginDescriptor(where=[PluginDescriptor.WHERE_SESSIONSTART], fnc=sessionstart)
 			]
-	elif hw_type == 'minime':
+	elif hw_type == 'azboxminime':
 		return [
 			PluginDescriptor(name="CRClock_setup", description="CR set freq", where = PluginDescriptor.WHERE_MENU, fnc=startSetup1),
 			PluginDescriptor(name="AVp_setup", description="scan mode & interlaced algo", where = PluginDescriptor.WHERE_MENU, fnc=startSetup2),
