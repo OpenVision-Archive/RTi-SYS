@@ -305,13 +305,13 @@ class LoopSyncMain(ConfigListScreen, Screen):
 		self.RtiminimeTimer = eTimer()
 		self.AVptimeTimer = eTimer()
 		hw_type = HardwareInfo().get_device_name()
-		if hw_type == "me" or hw_type == "minime" :
+		if hw_type == "azboxme" or hw_type == "azboxminime" :
 			self.LEDtimeTimer.callback.append(self.updateLED)
-			if hw_type == "minime" :
+			if hw_type == "azboxminime" :
 				self.RtiminimeTimer.callback.append(self.updateCR)
-		elif hw_type == 'elite' or hw_type == 'premium' or hw_type == 'premium+' or hw_type == 'ultra' :
+		elif hw_type == 'azboxhd':
 			self.LEDtimeTimer.callback.append(self.updateLEDHD)
-		if hw_type == 'ultra' or hw_type == 'premium+':
+		if hw_type == 'azboxhd':
 			self.FANtimeTimer.callback.append(self.updateFAN)
 		self.RtimeTimer.callback.append(self.updateRT)
 		self.AVptimeTimer.callback.append(self.updateAVp)
