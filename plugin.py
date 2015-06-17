@@ -362,7 +362,7 @@ class LoopSyncMain(ConfigListScreen, Screen):
 			self.FanON = "5"
 			self.FanOff = "5"
 		if Screens.Standby.inStandby and oInd <> "0":
-			if oInd == "1" and self.FanState == 0:
+			if (oInd == "1" or oInd == "998") and self.FanState == 0:
 				self.FanState = 1
 				try:
 					open("/proc/fan", "w").write("0")
@@ -370,7 +370,7 @@ class LoopSyncMain(ConfigListScreen, Screen):
 					open("/proc/fan", "w").close()
 				except OSError:
 					print " ==>> Fan turned Off - failed."
-			elif oInd <> "0" and oInd <> "1":
+			elif oInd <> "0" and oInd <> "1" and oInd <> "998":
 				if self.FanState == 0:
 					self.FOnTest += 1
 					if self.FOnTest >= int(self.FanON):
