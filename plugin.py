@@ -304,14 +304,16 @@ class LoopSyncMain(ConfigListScreen, Screen):
 		self.RtimeTimer = eTimer()
 		self.RtiminimeTimer = eTimer()
 		self.AVptimeTimer = eTimer()
-		hw_type = HardwareInfo().get_device_name()
-		if hw_type == "me" or hw_type == "minime" :
+		f = open("/proc/stb/info/model",'r')
+		hw_type = f.readline().strip()
+		f.close()
+		if hw_type in ("me", "minime"):
 			self.LEDtimeTimer.callback.append(self.updateLED)
-			if hw_type == "minime" :
+			if hw_type == "minime":
 				self.RtiminimeTimer.callback.append(self.updateCR)
-		elif hw_type == 'elite' or hw_type == 'premium' or hw_type == 'premium+' or hw_type == 'ultra' :
+		elif hw_type in ('elite', 'premium', 'premium+', 'ultra'):
 			self.LEDtimeTimer.callback.append(self.updateLEDHD)
-		if hw_type == 'ultra' or hw_type == 'premium+':
+		if hw_type in ('ultra', 'premium+'):
 			self.FANtimeTimer.callback.append(self.updateFAN)
 		self.RtimeTimer.callback.append(self.updateRT)
 		self.AVptimeTimer.callback.append(self.updateAVp)
@@ -428,7 +430,9 @@ class LoopSyncMain(ConfigListScreen, Screen):
 #_______________________ Led & RTC/SystemTime ________________________
 
 	def updateRT(self):
-		hw_type = HardwareInfo().get_device_name()
+		f = open("/proc/stb/info/model",'r')
+		hw_type = f.readline().strip()
+		f.close()
 		godina = int(datetime.utcnow().timetuple() [0])
 		if self.testRTCSet <> 0 : 
 			return
@@ -443,11 +447,13 @@ class LoopSyncMain(ConfigListScreen, Screen):
 			self.RtimeTimer.start(10000, True)
 
 	def SetTime(self):
-		hw_type = HardwareInfo().get_device_name()
+		f = open("/proc/stb/info/model",'r')
+		hw_type = f.readline().strip()
+		f.close()
 		TBefore = mktime(datetime.utcnow().timetuple())
 		cmd = str("ntpdate 0.debian.pool.ntp.org")
 		print "NTP Update - DONE"
-		if hw_type == 'elite' or hw_type == 'premium' or hw_type == 'premium+' or hw_type == 'ultra' : return
+		if hw_type in ('elite', 'premium', 'premium+', 'ultra' : return
 		TAfter = mktime(datetime.utcnow().timetuple())
 		self.testRTCSet = 1
 		deviation = abs(TAfter - TBefore)
@@ -572,14 +578,16 @@ def sessionstart(session, **kwargs):
 
 
 def Plugins(**kwargs):
-	hw_type = HardwareInfo().get_device_name()
-	if hw_type == 'azboxhd':
+	f = open("/proc/stb/info/model",'r')
+	hw_type = f.readline().strip()
+	f.close()
+	if hw_type == 'ultra' or hw_type == 'premium+':
 		return [
 			PluginDescriptor(name="FanCtrl", description="FAN Controll", where = PluginDescriptor.WHERE_MENU, fnc=startSetup),
 			PluginDescriptor(name="AVp_setup", description="scan mode & interlaced algo", where = PluginDescriptor.WHERE_MENU, fnc=startSetup2),
 			PluginDescriptor(where=[PluginDescriptor.WHERE_SESSIONSTART], fnc=sessionstart)
 			]
-	elif hw_type == 'azboxminime':
+	elif hw_type == 'minime':
 		return [
 			PluginDescriptor(name="CRClock_setup", description="CR set freq", where = PluginDescriptor.WHERE_MENU, fnc=startSetup1),
 			PluginDescriptor(name="AVp_setup", description="scan mode & interlaced algo", where = PluginDescriptor.WHERE_MENU, fnc=startSetup2),
