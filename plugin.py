@@ -453,7 +453,7 @@ class LoopSyncMain(ConfigListScreen, Screen):
 		TBefore = mktime(datetime.utcnow().timetuple())
 		cmd = str("ntpdate 0.debian.pool.ntp.org")
 		print "NTP Update - DONE"
-		if hw_type in ('elite', 'premium', 'premium+', 'ultra') : return
+		if hw_type in ('elite', 'premium', 'premium+', 'ultra' : return
 		TAfter = mktime(datetime.utcnow().timetuple())
 		self.testRTCSet = 1
 		deviation = abs(TAfter - TBefore)
