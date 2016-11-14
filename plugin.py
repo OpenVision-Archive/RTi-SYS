@@ -453,7 +453,7 @@ class LoopSyncMain(ConfigListScreen, Screen):
 		TBefore = mktime(datetime.utcnow().timetuple())
 		cmd = str("ntpdate 0.debian.pool.ntp.org")
 		print "NTP Update - DONE"
-		if hw_type in ('elite', 'premium', 'premium+', 'ultra' : return
+		if hw_type in ('elite', 'premium', 'premium+', 'ultra'): return
 		TAfter = mktime(datetime.utcnow().timetuple())
 		self.testRTCSet = 1
 		deviation = abs(TAfter - TBefore)
@@ -581,7 +581,7 @@ def Plugins(**kwargs):
 	f = open("/proc/stb/info/model",'r')
 	hw_type = f.readline().strip()
 	f.close()
-	if hw_type == 'ultra' or hw_type == 'premium+':
+	if hw_type in ('ultra', 'premium+'):
 		return [
 			PluginDescriptor(name="FanCtrl", description="FAN Controll", where = PluginDescriptor.WHERE_MENU, fnc=startSetup),
 			PluginDescriptor(name="AVp_setup", description="scan mode & interlaced algo", where = PluginDescriptor.WHERE_MENU, fnc=startSetup2),
