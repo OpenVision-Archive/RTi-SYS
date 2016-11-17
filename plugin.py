@@ -4,28 +4,22 @@ from Components.ConfigList import ConfigListScreen
 from Components.Label import Label
 from Components.Sources.StaticText import StaticText
 from Screens.Screen import Screen
-from os import popen
 from enigma import eTimer
 from Components.Sources.List import List
-from Tools.HardwareInfo import HardwareInfo
 import os
-from Components.Pixmap import Pixmap
 import Screens.InfoBar
 from enigma import *
 from Components.config import configfile, getConfigListEntry, ConfigEnableDisable, \
 	ConfigYesNo, ConfigText, ConfigDateTime, ConfigClock, ConfigNumber, ConfigSelectionNumber, ConfigSelection, \
 	config, ConfigSubsection, ConfigSubList, ConfigSubDict, ConfigIP, ConfigSlider, ConfigDirectory, ConfigInteger
 from time import gmtime, strftime, localtime, mktime, time, sleep, mktime
-from datetime import datetime, timedelta 
-#############
-# Globals
-
+from datetime import datetime, timedelta
 
 config.plugins.RtiSYS = ConfigSubsection()
 config.plugins.RtiSYS.FanMode = ConfigSelection(choices = {"0": _("Always ON"), "998": _("Always Off"), "1": _("Off in Standby"), "2": _("Cycle (5 Min ON ~ 5 Min Off)"), "999": _("Custom - Cycle")}, default="0")
 config.plugins.RtiSYS.FanON = ConfigSelection(choices = {"6": _("1min"), "30": _("5min"), "60": _("10min"), "90": _("15min"), "120": _("20min"), "150": _("25min"), "180": _("30min")}, default="60")
 config.plugins.RtiSYS.FanOff = ConfigSelection(choices = {"6": _("1min"), "30": _("5min"), "60": _("10min"), "90": _("15min"), "120": _("20min"), "150": _("25min"), "180": _("30min")}, default="60")
-config.plugins.RtiSYS.CRClock = ConfigSlider(default = 357,  increment = 1, limits = (300, 1600))
+config.plugins.RtiSYS.CRClock = ConfigSlider(default = 357, increment = 1, limits = (300, 1600))
 config.plugins.RtiSYS.CRVoltage = ConfigSelection(choices = {"0": _("5V"), "1": _("3.3V")}, default="0")
 config.plugins.RtiSYS.ScanMode = ConfigSelection(choices = {"1": _("Source"), "2": _("Progressive"), "3": _("Interlaced_TopFieldFirst"), "4": _("Interlaced_BotFieldFirst")}, default="1")
 config.plugins.RtiSYS.Interlaced = ConfigSelection(choices = {"1": _("DECODER_SPECIFICATION"), "2": _("MPEG2_PROGRESSIVE_SEQ"), "3": _("MPEG2_MENU_PROGRESSIVE")}, default="1")
@@ -49,7 +43,7 @@ class FanCtrlConfig(ConfigListScreen, Screen):
 		Screen.__init__(self, session)
 		self.session = session
 		self["poraka"] = Label(_("please setup fan control mode when the receiver is in Standby"))
-		self.list = []		
+		self.list = []
 		self["actions"] = ActionMap(["ChannelSelectBaseActions","WizardActions", "DirectionActions","MenuActions","NumberActions","ColorActions"],
 		{
 			"save": self.SaveCfg, 
@@ -59,10 +53,10 @@ class FanCtrlConfig(ConfigListScreen, Screen):
 			"red": self.Izlaz,
 		}, -2)
 		self["key_red"] = StaticText(_("Exit"))
-		self["key_green"] = StaticText(_("Save Conf"))		
+		self["key_green"] = StaticText(_("Save Conf"))
 		ConfigListScreen.__init__(self, self.list)
 		self.createSetup()
-		
+
 	def keyLeft(self):
 		ConfigListScreen.keyLeft(self)
 		self.createSetup()
@@ -86,11 +80,10 @@ class FanCtrlConfig(ConfigListScreen, Screen):
 		config.plugins.RtiSYS.FanMode.save()
 		config.plugins.RtiSYS.FanON.save()
 		config.plugins.RtiSYS.FanOff.save()
-		self.close()	
+		self.close()
 
 	def Izlaz(self):
-		self.close()	
-#####################################################################
+		self.close()
 
 class CRClock(ConfigListScreen, Screen):
   
@@ -108,7 +101,7 @@ class CRClock(ConfigListScreen, Screen):
 		Screen.__init__(self, session)
 		self.session = session
 		self["poraka"] = Label(_("Please use ChUp, ChDown, Left, Right buttons to SetUp Card Reader Clock & Voltage."))
-		self.list = []		
+		self.list = []
 		self["actions"] = ActionMap(["ChannelSelectBaseActions","WizardActions", "DirectionActions","MenuActions","NumberActions","ColorActions"],
 		{
 			"save": self.SaveCfg, 
@@ -120,10 +113,10 @@ class CRClock(ConfigListScreen, Screen):
 			"prevBouquet": self.keyDwon,
 		}, -2)
 		self["key_red"] = StaticText(_("Exit"))
-		self["key_green"] = StaticText(_("Set Clock"))		
+		self["key_green"] = StaticText(_("Set Clock"))
 		ConfigListScreen.__init__(self, self.list)
 		self.createSetup()
-		
+
 	def keyLeft(self):
 		ConfigListScreen.keyLeft(self)
 		self.createSetup()
@@ -155,21 +148,18 @@ class CRClock(ConfigListScreen, Screen):
 		config.plugins.RtiSYS.CRVoltage.save()
 		try:
 			open("/proc/sc_clock", "w").write(str(config.plugins.RtiSYS.CRClock.value))
-			print " ==>> Set CRClock."
 			open("/proc/sc_clock", "w").close()
 		except Exception, e:
 			print e
 		try:
 			open("/proc/sc_35v", "w").write(str(config.plugins.RtiSYS.CRVoltage.value))
-			print " ==>> Set CRVoltage."
 			open("/proc/sc_35v", "w").close()
 		except Exception, e:
 			print e
-		self.close()	
+		self.close()
 
 	def Izlaz(self):
-		self.close()	
-#####################################################################
+		self.close()
 
 class AVpSet(ConfigListScreen, Screen):
   
@@ -189,7 +179,7 @@ class AVpSet(ConfigListScreen, Screen):
 		self.session = session
 		self["poraka"] = Label(_("."))
 		self["poraka1"] = Label(_("."))
-		self.list = []		
+		self.list = []
 		self["actions"] = ActionMap(["ChannelSelectBaseActions","WizardActions", "DirectionActions","MenuActions","NumberActions","ColorActions"],
 		{
 			"save": self.SaveCfg, 
@@ -201,10 +191,10 @@ class AVpSet(ConfigListScreen, Screen):
 			"up": self.keyDwon,
 		}, -2)
 		self["key_red"] = StaticText(_("Exit"))
-		self["key_green"] = StaticText(_("Save"))		
+		self["key_green"] = StaticText(_("Save"))
 		ConfigListScreen.__init__(self, self.list)
 		self.createSetup()
-		
+
 	def keyLeft(self):
 		ConfigListScreen.keyLeft(self)
 		self.createSetup()
@@ -251,24 +241,21 @@ class AVpSet(ConfigListScreen, Screen):
 			if el == "3": expl = "This is a slightly different form of EMhwlibDeinterlacingMode_Weave where a weight is applied on each field in order to diminish the motion's artifacts."
 			if el == "4": expl = "Both Weave and Bob deinterlacing are used. Two scalers are used, one to compute the movement between field N-1 and N+1, and the other to generate a Weave N frame from field N-1 and field N+1. The other scaler applies a Bob algorithm on field N to generate the frame N. Finally, the two frames are mixed, with an alpha modulated by the movement detection. In the areas where no motion or little motion is detected, the Weave frame N is used, but in case of motion the Bob frame is used. Finally, the alpha can be also statically modified (on top of movement detection) with two weight factors to increase the Weave or Bob weight in the final frame."
 		self["poraka1"].setText(expl)
-		self.ActCfg()	
+		self.ActCfg()
 
 	def ActCfg(self):
 		try:
 			open("/proc/input_scan_mode", "w").write(str(config.plugins.RtiSYS.ScanMode.value))
-			print " ==>> Set input_scan_mode."
 			open("/proc/input_scan_mode", "w").close()
 		except Exception, e:
 			print e
 		try:
 			open("/proc/interlaced_algo", "w").write(str(config.plugins.RtiSYS.Interlaced.value))
-			print " ==>> Set Interlaced Algo."
 			open("/proc/interlaced_algo", "w").close()
 		except Exception, e:
 			print e
 		try:
 			open("/proc/deinterlace_mode", "w").write(str(config.plugins.RtiSYS.DeinterlacingMode.value))
-			print " ==>> Set Deinterlace Mode."
 			open("/proc/deinterlace_mode", "w").close()
 		except Exception, e:
 			print e
@@ -277,12 +264,11 @@ class AVpSet(ConfigListScreen, Screen):
 		config.plugins.RtiSYS.ScanMode.save()
 		config.plugins.RtiSYS.Interlaced.save()
 		config.plugins.RtiSYS.DeinterlacingMode.save()
-		self.ActCfg()	
-		self.close()	
+		self.ActCfg()
+		self.close()
 
 	def Izlaz(self):
-		self.close()	
-#####################################################################
+		self.close()
 
 class LoopSyncMain(ConfigListScreen, Screen):
 	def __init__(self, session, args = None):
@@ -323,43 +309,38 @@ class LoopSyncMain(ConfigListScreen, Screen):
 		self.RtiminimeTimer.start(12000, True)
 		self.AVptimeTimer.start(12000, True)
 
-#_______________________ AVplus ________________________
 	def updateAVp(self):
 		try:
 			strScan_mode = str(config.plugins.RtiSYS.ScanMode.value)
 			open("/proc/input_scan_mode", "w").write(strScan_mode)
-			print " ==>> Set input_scan_mode."
 			open("/proc/input_scan_mode", "w").close()
 		except Exception, e:
 			print e
 		try:
 			strInterlaced_algo = str(config.plugins.RtiSYS.Interlaced.value)
 			open("/proc/interlaced_algo", "w").write(strInterlaced_algo)
-			print " ==>> Set Interlaced Algo."
 			open("/proc/interlaced_algo", "w").close()
 		except Exception, e:
 			print e
 		try:
 			strDeinterlace_mode = str(config.plugins.RtiSYS.DeinterlacingMode.value)
 			open("/proc/deinterlace_mode", "w").write(strDeinterlace_mode)
-			print " ==>> Set Deinterlace Mode."
 			open("/proc/deinterlace_mode", "w").close()
 		except Exception, e:
 			print e
-#_______________________ FAN ________________________
+
 	def updateFAN(self):
 		oInd = config.plugins.RtiSYS.FanMode.value
 		if oInd == "998" and self.FanState == 0:
 			self.FanState = 1
 			try:
 				open("/proc/fan", "w").write("0")
-				print " ==>> Fan turned Off."
 				open("/proc/fan", "w").close()
 			except OSError:
 				print " ==>> Fan turned Off - failed."
 		if oInd == "999":
 			self.FanON = config.plugins.RtiSYS.FanON.value
-			self.FanOff = config.plugins.RtiSYS.FanOff.value		
+			self.FanOff = config.plugins.RtiSYS.FanOff.value
 		else:
 			self.FanON = "5"
 			self.FanOff = "5"
@@ -368,7 +349,6 @@ class LoopSyncMain(ConfigListScreen, Screen):
 				self.FanState = 1
 				try:
 					open("/proc/fan", "w").write("0")
-					print " ==>> Fan turned Off."
 					open("/proc/fan", "w").close()
 				except OSError:
 					print " ==>> Fan turned Off - failed."
@@ -380,7 +360,6 @@ class LoopSyncMain(ConfigListScreen, Screen):
 						self.FanState = 1
 						try:
 							open("/proc/fan", "w").write("0")
-							print " ==>> Fan turned Off."
 							open("/proc/fan", "w").close()
 						except OSError:
 							print " ==>> Fan turned Off - failed."
@@ -391,16 +370,13 @@ class LoopSyncMain(ConfigListScreen, Screen):
 						self.FanState = 0
 						try:
 							open("/proc/fan", "w").write("1")
-							print " ==>> Fan turned On."
 							open("/proc/fan", "w").close()
 						except OSError:
 							print " ==>> Fan turned On - failed."
 		else:
-			#if self.FanState == 1:
 			if oInd <> "998" and self.FanState == 1:
 				try:
 					open("/proc/fan", "w").write("1")
-					print " ==>> Fan turned On."
 					open("/proc/fan", "w").close()
 				except OSError:
 					print " ==>> Fan turned On - failed."
@@ -409,25 +385,20 @@ class LoopSyncMain(ConfigListScreen, Screen):
 			self.FOffTest = 0
 		self.FANtimeTimer.start(10000, True)
 
-#_______________________ CR Clock & Voltage ________________________
-
 	def updateCR(self):
 		try:
 			strCRClock = str(config.plugins.RtiSYS.CRClock.value)
 			open("/proc/sc_clock", "w").write(strCRClock)
-			print " ==>> Set CRClock : " , strCRClock
 			open("/proc/sc_clock", "w").close()
 		except Exception, e:
 			print e
 		try:
 			strCRVoltage = str(config.plugins.RtiSYS.CRVoltage.value)
 			open("/proc/sc_35v", "w").write(str(config.plugins.RtiSYS.CRVoltage.value))
-			print " ==>> Set CRVoltage : ", strCRVoltage
 			open("/proc/sc_35v", "w").close()
 		except Exception, e:
 			print e
-		return	
-#_______________________ Led & RTC/SystemTime ________________________
+		return
 
 	def updateRT(self):
 		f = open("/proc/stb/info/model",'r')
@@ -452,14 +423,11 @@ class LoopSyncMain(ConfigListScreen, Screen):
 		f.close()
 		TBefore = mktime(datetime.utcnow().timetuple())
 		cmd = str("ntpdate 0.debian.pool.ntp.org")
-		print "NTP Update - DONE"
 		if hw_type in ('elite', 'premium', 'premium+', 'ultra'): return
 		TAfter = mktime(datetime.utcnow().timetuple())
 		self.testRTCSet = 1
 		deviation = abs(TAfter - TBefore)
-		print "Deviation: " , deviation , "sec."
 		if deviation <= 60: return
-#-------------------------------------------
 		UTCTim = datetime.utcnow().timetuple()
 		godina = '0000' + str(UTCTim [0])
 		godina = godina [len(godina) - 4:]
@@ -482,10 +450,8 @@ class LoopSyncMain(ConfigListScreen, Screen):
 		tzpredznak = tmp[:1]
 		tzvalue = str(int(tmp[1:3]))
 		TimeString = TimeString + tzpredznak + tzvalue
-		import os
 		cmd = 'echo "' + str(TimeString) + '" > /proc/settime'
 		os.system(cmd)
-		print "RTC Update - DONE"
 
 	def updateLEDHD(self):
 		try:
@@ -543,11 +509,6 @@ class LoopSyncMain(ConfigListScreen, Screen):
 			pass
 
 		self.LEDtimeTimer.start(1000, True)
-
-
-#loopsyncmain = LoopSyncMain()
-#####################################################################
-
 
 def FanCtrlMain(session, **kwargs):
 	session.open(FanCtrlConfig)
