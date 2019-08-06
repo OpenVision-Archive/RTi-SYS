@@ -31,8 +31,8 @@ class FanCtrlConfig(ConfigListScreen, Screen):
   
 	skin = """
 		<screen position="center,center" size="320,225" title="FANSet v.2.1" >
-		<ePixmap pixmap="skin_default/buttons/red.png" position="10,180" size="140,40" transparent="1" alphatest="on" />
-		<ePixmap pixmap="skin_default/buttons/green.png" position="170,180" size="140,40" transparent="1" alphatest="on" />
+		<ePixmap pixmap="buttons/red.png" position="10,180" size="140,40" transparent="1" alphatest="on" />
+		<ePixmap pixmap="buttons/green.png" position="170,180" size="140,40" transparent="1" alphatest="on" />
 		<widget source="key_red" render="Label" position="10,180" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#9f1313" transparent="1" />
 		<widget source="key_green" render="Label" position="170,180" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#9f1313" transparent="1" />
 		<widget name="config" position="10,10" size="300,80" scrollbarMode="showOnDemand" />
@@ -89,8 +89,8 @@ class CRClock(ConfigListScreen, Screen):
   
 	skin = """
 		<screen position="center,center" size="380,225" title="Card Reader Set v.1.0" >
-		<ePixmap pixmap="skin_default/buttons/red.png" position="10,180" size="140,40" transparent="1" alphatest="on" />
-		<ePixmap pixmap="skin_default/buttons/green.png" position="230,180" size="140,40" transparent="1" alphatest="on" />
+		<ePixmap pixmap="buttons/red.png" position="10,180" size="140,40" transparent="1" alphatest="on" />
+		<ePixmap pixmap="buttons/green.png" position="230,180" size="140,40" transparent="1" alphatest="on" />
 		<widget source="key_red" render="Label" position="10,180" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#9f1313" transparent="1" />
 		<widget source="key_green" render="Label" position="230,180" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#9f1313" transparent="1" />
 		<widget name="config" position="10,10" size="350,50" scrollbarMode="showOnDemand" />
@@ -165,8 +165,8 @@ class AVpSet(ConfigListScreen, Screen):
   
 	skin = """
 		<screen position="center,center" size="760,395" title="A/V settings + v.1.0" >
-		<ePixmap pixmap="skin_default/buttons/red.png" position="10,350" size="140,40" transparent="1" alphatest="on" />
-		<ePixmap pixmap="skin_default/buttons/green.png" position="610,350" size="140,40" transparent="1" alphatest="on" />
+		<ePixmap pixmap="buttons/red.png" position="10,350" size="140,40" transparent="1" alphatest="on" />
+		<ePixmap pixmap="buttons/green.png" position="610,350" size="140,40" transparent="1" alphatest="on" />
 		<widget source="key_red" render="Label" position="10,350" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#9f1313" transparent="1" />
 		<widget source="key_green" render="Label" position="610,350" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#9f1313" transparent="1" />
 		<widget name="config" position="10,10" size="740,75" scrollbarMode="showOnDemand" />
