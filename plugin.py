@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+from __future__ import print_function
 from Plugins.Plugin import PluginDescriptor
 from Components.ActionMap import ActionMap
 from Components.ConfigList import ConfigListScreen
@@ -150,12 +153,12 @@ class CRClock(ConfigListScreen, Screen):
 			open("/proc/sc_clock", "w").write(str(config.plugins.RtiSYS.CRClock.value))
 			open("/proc/sc_clock", "w").close()
 		except Exception, e:
-			print e
+			print(e)
 		try:
 			open("/proc/sc_35v", "w").write(str(config.plugins.RtiSYS.CRVoltage.value))
 			open("/proc/sc_35v", "w").close()
 		except Exception, e:
-			print e
+			print(e)
 		self.close()
 
 	def Izlaz(self):
@@ -248,17 +251,17 @@ class AVpSet(ConfigListScreen, Screen):
 			open("/proc/input_scan_mode", "w").write(str(config.plugins.RtiSYS.ScanMode.value))
 			open("/proc/input_scan_mode", "w").close()
 		except Exception, e:
-			print e
+			print(e)
 		try:
 			open("/proc/interlaced_algo", "w").write(str(config.plugins.RtiSYS.Interlaced.value))
 			open("/proc/interlaced_algo", "w").close()
 		except Exception, e:
-			print e
+			print(e)
 		try:
 			open("/proc/deinterlace_mode", "w").write(str(config.plugins.RtiSYS.DeinterlacingMode.value))
 			open("/proc/deinterlace_mode", "w").close()
 		except Exception, e:
-			print e
+			print(e)
 
 	def SaveCfg(self):
 		config.plugins.RtiSYS.ScanMode.save()
@@ -315,19 +318,19 @@ class LoopSyncMain(ConfigListScreen, Screen):
 			open("/proc/input_scan_mode", "w").write(strScan_mode)
 			open("/proc/input_scan_mode", "w").close()
 		except Exception, e:
-			print e
+			print(e)
 		try:
 			strInterlaced_algo = str(config.plugins.RtiSYS.Interlaced.value)
 			open("/proc/interlaced_algo", "w").write(strInterlaced_algo)
 			open("/proc/interlaced_algo", "w").close()
 		except Exception, e:
-			print e
+			print(e)
 		try:
 			strDeinterlace_mode = str(config.plugins.RtiSYS.DeinterlacingMode.value)
 			open("/proc/deinterlace_mode", "w").write(strDeinterlace_mode)
 			open("/proc/deinterlace_mode", "w").close()
 		except Exception, e:
-			print e
+			print(e)
 
 	def updateFAN(self):
 		oInd = config.plugins.RtiSYS.FanMode.value
@@ -337,7 +340,7 @@ class LoopSyncMain(ConfigListScreen, Screen):
 				open("/proc/fan", "w").write("0")
 				open("/proc/fan", "w").close()
 			except OSError:
-				print " ==>> Fan turned Off - failed."
+				print(" ==>> Fan turned Off - failed.")
 		if oInd == "999":
 			self.FanON = config.plugins.RtiSYS.FanON.value
 			self.FanOff = config.plugins.RtiSYS.FanOff.value
@@ -351,7 +354,7 @@ class LoopSyncMain(ConfigListScreen, Screen):
 					open("/proc/fan", "w").write("0")
 					open("/proc/fan", "w").close()
 				except OSError:
-					print " ==>> Fan turned Off - failed."
+					print(" ==>> Fan turned Off - failed.")
 			elif oInd <> "0" and oInd <> "1" and oInd <> "998":
 				if self.FanState == 0:
 					self.FOnTest += 1
@@ -362,7 +365,7 @@ class LoopSyncMain(ConfigListScreen, Screen):
 							open("/proc/fan", "w").write("0")
 							open("/proc/fan", "w").close()
 						except OSError:
-							print " ==>> Fan turned Off - failed."
+							print(" ==>> Fan turned Off - failed.")
 				else:
 					self.FOffTest += 1
 					if self.FOffTest >= int(self.FanOff):
@@ -372,14 +375,14 @@ class LoopSyncMain(ConfigListScreen, Screen):
 							open("/proc/fan", "w").write("1")
 							open("/proc/fan", "w").close()
 						except OSError:
-							print " ==>> Fan turned On - failed."
+							print(" ==>> Fan turned On - failed.")
 		else:
 			if oInd <> "998" and self.FanState == 1:
 				try:
 					open("/proc/fan", "w").write("1")
 					open("/proc/fan", "w").close()
 				except OSError:
-					print " ==>> Fan turned On - failed."
+					print(" ==>> Fan turned On - failed.")
 				self.FanState = 0
 			self.FOnTest = int(self.FanON)
 			self.FOffTest = 0
@@ -391,13 +394,13 @@ class LoopSyncMain(ConfigListScreen, Screen):
 			open("/proc/sc_clock", "w").write(strCRClock)
 			open("/proc/sc_clock", "w").close()
 		except Exception, e:
-			print e
+			print(e)
 		try:
 			strCRVoltage = str(config.plugins.RtiSYS.CRVoltage.value)
 			open("/proc/sc_35v", "w").write(str(config.plugins.RtiSYS.CRVoltage.value))
 			open("/proc/sc_35v", "w").close()
 		except Exception, e:
-			print e
+			print(e)
 		return
 
 	def updateRT(self):
