@@ -153,12 +153,12 @@ class CRClock(ConfigListScreen, Screen):
 			open("/proc/sc_clock", "w").write(str(config.plugins.RtiSYS.CRClock.value))
 			open("/proc/sc_clock", "w").close()
 		except Exception as e:
-			print(e)
+			print(str(e))
 		try:
 			open("/proc/sc_35v", "w").write(str(config.plugins.RtiSYS.CRVoltage.value))
 			open("/proc/sc_35v", "w").close()
 		except Exception as e:
-			print(e)
+			print(str(e))
 		self.close()
 
 	def Izlaz(self):
@@ -251,17 +251,17 @@ class AVpSet(ConfigListScreen, Screen):
 			open("/proc/input_scan_mode", "w").write(str(config.plugins.RtiSYS.ScanMode.value))
 			open("/proc/input_scan_mode", "w").close()
 		except Exception as e:
-			print(e)
+			print(str(e))
 		try:
 			open("/proc/interlaced_algo", "w").write(str(config.plugins.RtiSYS.Interlaced.value))
 			open("/proc/interlaced_algo", "w").close()
 		except Exception as e:
-			print(e)
+			print(str(e))
 		try:
 			open("/proc/deinterlace_mode", "w").write(str(config.plugins.RtiSYS.DeinterlacingMode.value))
 			open("/proc/deinterlace_mode", "w").close()
 		except Exception as e:
-			print(e)
+			print(str(e))
 
 	def SaveCfg(self):
 		config.plugins.RtiSYS.ScanMode.save()
@@ -318,19 +318,19 @@ class LoopSyncMain(ConfigListScreen, Screen):
 			open("/proc/input_scan_mode", "w").write(strScan_mode)
 			open("/proc/input_scan_mode", "w").close()
 		except Exception as e:
-			print(e)
+			print(str(e))
 		try:
 			strInterlaced_algo = str(config.plugins.RtiSYS.Interlaced.value)
 			open("/proc/interlaced_algo", "w").write(strInterlaced_algo)
 			open("/proc/interlaced_algo", "w").close()
 		except Exception as e:
-			print(e)
+			print(str(e))
 		try:
 			strDeinterlace_mode = str(config.plugins.RtiSYS.DeinterlacingMode.value)
 			open("/proc/deinterlace_mode", "w").write(strDeinterlace_mode)
 			open("/proc/deinterlace_mode", "w").close()
 		except Exception as e:
-			print(e)
+			print(str(e))
 
 	def updateFAN(self):
 		oInd = config.plugins.RtiSYS.FanMode.value
@@ -394,13 +394,13 @@ class LoopSyncMain(ConfigListScreen, Screen):
 			open("/proc/sc_clock", "w").write(strCRClock)
 			open("/proc/sc_clock", "w").close()
 		except Exception as e:
-			print(e)
+			print(str(e))
 		try:
 			strCRVoltage = str(config.plugins.RtiSYS.CRVoltage.value)
 			open("/proc/sc_35v", "w").write(str(config.plugins.RtiSYS.CRVoltage.value))
 			open("/proc/sc_35v", "w").close()
 		except Exception as e:
-			print(e)
+			print(str(e))
 		return
 
 	def updateRT(self):
