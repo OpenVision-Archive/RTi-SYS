@@ -47,7 +47,7 @@ class FanCtrlConfig(ConfigListScreen, Screen):
 		self.session = session
 		self["poraka"] = Label(_("please setup fan control mode when the receiver is in Standby"))
 		self.list = []
-		self["actions"] = ActionMap(["ChannelSelectBaseActions","WizardActions", "DirectionActions","MenuActions","NumberActions","ColorActions"],
+		self["actions"] = ActionMap(["ChannelSelectBaseActions", "WizardActions", "DirectionActions", "MenuActions", "NumberActions", "ColorActions"],
 		{
 			"save": self.SaveCfg, 
 			"back": self.Izlaz, 
@@ -105,7 +105,7 @@ class CRClock(ConfigListScreen, Screen):
 		self.session = session
 		self["poraka"] = Label(_("Please use ChUp, ChDown, Left, Right buttons to SetUp Card Reader Clock & Voltage."))
 		self.list = []
-		self["actions"] = ActionMap(["ChannelSelectBaseActions","WizardActions", "DirectionActions","MenuActions","NumberActions","ColorActions"],
+		self["actions"] = ActionMap(["ChannelSelectBaseActions", "WizardActions", "DirectionActions", "MenuActions", "NumberActions", "ColorActions"],
 		{
 			"save": self.SaveCfg, 
 			"back": self.Izlaz, 
@@ -183,7 +183,7 @@ class AVpSet(ConfigListScreen, Screen):
 		self["poraka"] = Label(_("."))
 		self["poraka1"] = Label(_("."))
 		self.list = []
-		self["actions"] = ActionMap(["ChannelSelectBaseActions","WizardActions", "DirectionActions","MenuActions","NumberActions","ColorActions"],
+		self["actions"] = ActionMap(["ChannelSelectBaseActions", "WizardActions", "DirectionActions", "MenuActions", "NumberActions", "ColorActions"],
 		{
 			"save": self.SaveCfg, 
 			"back": self.Izlaz, 
@@ -293,7 +293,7 @@ class LoopSyncMain(ConfigListScreen, Screen):
 		self.RtimeTimer = eTimer()
 		self.RtiminimeTimer = eTimer()
 		self.AVptimeTimer = eTimer()
-		f = open("/proc/stb/info/model",'r')
+		f = open("/proc/stb/info/model", 'r')
 		hw_type = f.readline().strip()
 		f.close()
 		if hw_type in ("me", "minime"):
@@ -404,7 +404,7 @@ class LoopSyncMain(ConfigListScreen, Screen):
 		return
 
 	def updateRT(self):
-		f = open("/proc/stb/info/model",'r')
+		f = open("/proc/stb/info/model", 'r')
 		hw_type = f.readline().strip()
 		f.close()
 		godina = int(datetime.utcnow().timetuple() [0])
@@ -421,7 +421,7 @@ class LoopSyncMain(ConfigListScreen, Screen):
 			self.RtimeTimer.start(10000, True)
 
 	def SetTime(self):
-		f = open("/proc/stb/info/model",'r')
+		f = open("/proc/stb/info/model", 'r')
 		hw_type = f.readline().strip()
 		f.close()
 		TBefore = mktime(datetime.utcnow().timetuple())
@@ -525,24 +525,24 @@ def AVpSetMain(session, **kwargs):
 def startSetup(menuid):
 	if menuid != "system":
 		return [ ]
-	return [(_("[Fan Set]") , FanCtrlMain, " FanCtrlSetupMain_setup", 9)]
+	return [(_("[Fan Set]"), FanCtrlMain, " FanCtrlSetupMain_setup", 9)]
 
 def startSetup1(menuid):
 	if menuid != "system":
 		return [ ]
-	return [(_("[Card Reader Set]") , CRClockMain, " CRClock_setup", 9)]
+	return [(_("[Card Reader Set]"), CRClockMain, " CRClock_setup", 9)]
 
 def startSetup2(menuid):
 	if menuid != "system":
 		return [ ]
-	return [(_("[A/V settings +]") , AVpSetMain, " AVp_setup", 9)]
+	return [(_("[A/V settings +]"), AVpSetMain, " AVp_setup", 9)]
 
 def sessionstart(session, **kwargs):
 	session.open(LoopSyncMain)
 
 
 def Plugins(**kwargs):
-	f = open("/proc/stb/info/model",'r')
+	f = open("/proc/stb/info/model", 'r')
 	hw_type = f.readline().strip()
 	f.close()
 	if hw_type in ('ultra', 'premium+'):
