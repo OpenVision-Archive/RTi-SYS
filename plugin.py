@@ -462,7 +462,7 @@ class LoopSyncMain(ConfigListScreen, Screen):
 		TimeZoneS = config.timezone.val.value
 		ipos1 = TimeZoneS.find("(GMT")
 		ipos2 = TimeZoneS.find(")")
-		tmp = TimeZoneS[ipos1+4:ipos2]
+		tmp = TimeZoneS[ipos1 + 4:ipos2]
 		if len(tmp) == 0:
 			tmp = "+00"
 		tzpredznak = tmp[:1]
