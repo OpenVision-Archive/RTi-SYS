@@ -19,15 +19,15 @@ from time import gmtime, strftime, localtime, mktime, time, sleep, mktime
 from datetime import datetime, timedelta
 
 config.plugins.RtiSYS = ConfigSubsection()
-config.plugins.RtiSYS.FanMode = ConfigSelection(choices = {"0": _("Always ON"), "998": _("Always Off"), "1": _("Off in Standby"), "2": _("Cycle (5 Min ON ~ 5 Min Off)"), "999": _("Custom - Cycle")}, default="0")
-config.plugins.RtiSYS.FanON = ConfigSelection(choices = {"6": _("1min"), "30": _("5min"), "60": _("10min"), "90": _("15min"), "120": _("20min"), "150": _("25min"), "180": _("30min")}, default="60")
-config.plugins.RtiSYS.FanOff = ConfigSelection(choices = {"6": _("1min"), "30": _("5min"), "60": _("10min"), "90": _("15min"), "120": _("20min"), "150": _("25min"), "180": _("30min")}, default="60")
-config.plugins.RtiSYS.CRClock = ConfigSlider(default = 357, increment = 1, limits = (300, 1600))
-config.plugins.RtiSYS.CRVoltage = ConfigSelection(choices = {"0": _("5V"), "1": _("3.3V")}, default="0")
-config.plugins.RtiSYS.ScanMode = ConfigSelection(choices = {"1": _("Source"), "2": _("Progressive"), "3": _("Interlaced_TopFieldFirst"), "4": _("Interlaced_BotFieldFirst")}, default="1")
-config.plugins.RtiSYS.Interlaced = ConfigSelection(choices = {"1": _("DECODER_SPECIFICATION"), "2": _("MPEG2_PROGRESSIVE_SEQ"), "3": _("MPEG2_MENU_PROGRESSIVE")}, default="1")
+config.plugins.RtiSYS.FanMode = ConfigSelection(choices={"0": _("Always ON"), "998": _("Always Off"), "1": _("Off in Standby"), "2": _("Cycle (5 Min ON ~ 5 Min Off)"), "999": _("Custom - Cycle")}, default="0")
+config.plugins.RtiSYS.FanON = ConfigSelection(choices={"6": _("1min"), "30": _("5min"), "60": _("10min"), "90": _("15min"), "120": _("20min"), "150": _("25min"), "180": _("30min")}, default="60")
+config.plugins.RtiSYS.FanOff = ConfigSelection(choices={"6": _("1min"), "30": _("5min"), "60": _("10min"), "90": _("15min"), "120": _("20min"), "150": _("25min"), "180": _("30min")}, default="60")
+config.plugins.RtiSYS.CRClock = ConfigSlider(default=357, increment=1, limits=(300, 1600))
+config.plugins.RtiSYS.CRVoltage = ConfigSelection(choices={"0": _("5V"), "1": _("3.3V")}, default="0")
+config.plugins.RtiSYS.ScanMode = ConfigSelection(choices={"1": _("Source"), "2": _("Progressive"), "3": _("Interlaced_TopFieldFirst"), "4": _("Interlaced_BotFieldFirst")}, default="1")
+config.plugins.RtiSYS.Interlaced = ConfigSelection(choices={"1": _("DECODER_SPECIFICATION"), "2": _("MPEG2_PROGRESSIVE_SEQ"), "3": _("MPEG2_MENU_PROGRESSIVE")}, default="1")
 #config.plugins.RtiSYS.DeinterlacingMode = ConfigSelection(choices = {"1": _("Discard_Bob"), "2": _("Weave"), "3": _("ConstantBlend"), "4": _("MotionAdaptative")}, default="1")
-config.plugins.RtiSYS.DeinterlacingMode = ConfigSelection(choices = {"1": _("Discard_Bob"), "2": _("Weave"), "3": _("ConstantBlend")}, default="1")
+config.plugins.RtiSYS.DeinterlacingMode = ConfigSelection(choices={"1": _("Discard_Bob"), "2": _("Weave"), "3": _("ConstantBlend")}, default="1")
 
 
 class FanCtrlConfig(ConfigListScreen, Screen):
@@ -42,7 +42,7 @@ class FanCtrlConfig(ConfigListScreen, Screen):
 		<widget name="poraka" position="10,130" font="Regular;16" halign="center" size="300,50" />
 		</screen>"""
 
-	def __init__(self, session, args = None):
+	def __init__(self, session, args=None):
 		Screen.__init__(self, session)
 		self.session = session
 		self["poraka"] = Label(_("please setup fan control mode when the receiver is in Standby"))
@@ -101,7 +101,7 @@ class CRClock(ConfigListScreen, Screen):
 		<widget name="poraka" position="10,130" font="Regular;16" halign="center" size="360,50" />
 		</screen>"""
 
-	def __init__(self, session, args = None):
+	def __init__(self, session, args=None):
 		Screen.__init__(self, session)
 		self.session = session
 		self["poraka"] = Label(_("Please use ChUp, ChDown, Left, Right buttons to SetUp Card Reader Clock & Voltage."))
@@ -178,7 +178,7 @@ class AVpSet(ConfigListScreen, Screen):
 		<widget name="poraka1" position="10,210" font="Regular;16" halign="center" valign="center" foregroundColor="#ff2222" size="740,130" />
 		</screen>"""
 
-	def __init__(self, session, args = None):
+	def __init__(self, session, args=None):
 		Screen.__init__(self, session)
 		self.session = session
 		self["poraka"] = Label(_("."))
@@ -286,7 +286,7 @@ class AVpSet(ConfigListScreen, Screen):
 		self.close()
 
 class LoopSyncMain(ConfigListScreen, Screen):
-	def __init__(self, session, args = None):
+	def __init__(self, session, args=None):
 		Screen.__init__(self, session)
 		self.session = session
 		self.gotSession()
@@ -563,18 +563,18 @@ def Plugins(**kwargs):
 	f.close()
 	if hw_type in ('ultra', 'premium+'):
 		return [
-			PluginDescriptor(name="FanCtrl", description="FAN Controll", where = PluginDescriptor.WHERE_MENU, fnc=startSetup),
-			PluginDescriptor(name="AVp_setup", description="scan mode & interlaced algo", where = PluginDescriptor.WHERE_MENU, fnc=startSetup2),
+			PluginDescriptor(name="FanCtrl", description="FAN Controll", where=PluginDescriptor.WHERE_MENU, fnc=startSetup),
+			PluginDescriptor(name="AVp_setup", description="scan mode & interlaced algo", where=PluginDescriptor.WHERE_MENU, fnc=startSetup2),
 			PluginDescriptor(where=[PluginDescriptor.WHERE_SESSIONSTART], fnc=sessionstart)
 			]
 	elif hw_type == 'minime':
 		return [
-			PluginDescriptor(name="CRClock_setup", description="CR set freq", where = PluginDescriptor.WHERE_MENU, fnc=startSetup1),
-			PluginDescriptor(name="AVp_setup", description="scan mode & interlaced algo", where = PluginDescriptor.WHERE_MENU, fnc=startSetup2),
+			PluginDescriptor(name="CRClock_setup", description="CR set freq", where=PluginDescriptor.WHERE_MENU, fnc=startSetup1),
+			PluginDescriptor(name="AVp_setup", description="scan mode & interlaced algo", where=PluginDescriptor.WHERE_MENU, fnc=startSetup2),
 			PluginDescriptor(where=[PluginDescriptor.WHERE_SESSIONSTART], fnc=sessionstart)
 			]
 	else:
 		return [
-			PluginDescriptor(name="AVp_setup", description="scan mode & interlaced algo", where = PluginDescriptor.WHERE_MENU, fnc=startSetup2),
+			PluginDescriptor(name="AVp_setup", description="scan mode & interlaced algo", where=PluginDescriptor.WHERE_MENU, fnc=startSetup2),
 			PluginDescriptor(where=[PluginDescriptor.WHERE_SESSIONSTART], fnc=sessionstart)
 			]
