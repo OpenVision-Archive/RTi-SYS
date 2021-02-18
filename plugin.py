@@ -31,7 +31,7 @@ config.plugins.RtiSYS.DeinterlacingMode = ConfigSelection(choices={"1": _("Disca
 
 
 class FanCtrlConfig(ConfigListScreen, Screen):
-  
+
 	skin = """
 		<screen position="center,center" size="320,225" title="FANSet v.2.1" >
 		<ePixmap pixmap="buttons/red.png" position="10,180" size="140,40" transparent="1" alphatest="on" />
@@ -49,8 +49,8 @@ class FanCtrlConfig(ConfigListScreen, Screen):
 		self.list = []
 		self["actions"] = ActionMap(["ChannelSelectBaseActions", "WizardActions", "DirectionActions", "MenuActions", "NumberActions", "ColorActions"],
 		{
-			"save": self.SaveCfg, 
-			"back": self.Izlaz, 
+			"save": self.SaveCfg,
+			"back": self.Izlaz,
 			"ok": self.SaveCfg,
 			"green": self.SaveCfg,
 			"red": self.Izlaz,
@@ -91,7 +91,7 @@ class FanCtrlConfig(ConfigListScreen, Screen):
 
 
 class CRClock(ConfigListScreen, Screen):
-  
+
 	skin = """
 		<screen position="center,center" size="380,225" title="Card Reader Set v.1.0" >
 		<ePixmap pixmap="buttons/red.png" position="10,180" size="140,40" transparent="1" alphatest="on" />
@@ -109,8 +109,8 @@ class CRClock(ConfigListScreen, Screen):
 		self.list = []
 		self["actions"] = ActionMap(["ChannelSelectBaseActions", "WizardActions", "DirectionActions", "MenuActions", "NumberActions", "ColorActions"],
 		{
-			"save": self.SaveCfg, 
-			"back": self.Izlaz, 
+			"save": self.SaveCfg,
+			"back": self.Izlaz,
 			"ok": self.SaveCfg,
 			"green": self.SaveCfg,
 			"red": self.Izlaz,
@@ -168,7 +168,7 @@ class CRClock(ConfigListScreen, Screen):
 
 
 class AVpSet(ConfigListScreen, Screen):
-  
+
 	skin = """
 		<screen position="center,center" size="760,395" title="A/V settings + v.1.0" >
 		<ePixmap pixmap="buttons/red.png" position="10,350" size="140,40" transparent="1" alphatest="on" />
@@ -188,8 +188,8 @@ class AVpSet(ConfigListScreen, Screen):
 		self.list = []
 		self["actions"] = ActionMap(["ChannelSelectBaseActions", "WizardActions", "DirectionActions", "MenuActions", "NumberActions", "ColorActions"],
 		{
-			"save": self.SaveCfg, 
-			"back": self.Izlaz, 
+			"save": self.SaveCfg,
+			"back": self.Izlaz,
 			"ok": self.SaveCfg,
 			"green": self.SaveCfg,
 			"red": self.Izlaz,
@@ -423,9 +423,9 @@ class LoopSyncMain(ConfigListScreen, Screen):
 		hw_type = f.readline().strip()
 		f.close()
 		godina = int(datetime.utcnow().timetuple()[0])
-		if self.testRTCSet <> 0: 
+		if self.testRTCSet <> 0:
 			return
-		if godina >= 2012: 
+		if godina >= 2012:
 			return
 		else:
 			if self.testno >= 60:
