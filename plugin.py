@@ -89,6 +89,7 @@ class FanCtrlConfig(ConfigListScreen, Screen):
 	def Izlaz(self):
 		self.close()
 
+
 class CRClock(ConfigListScreen, Screen):
   
 	skin = """
@@ -164,6 +165,7 @@ class CRClock(ConfigListScreen, Screen):
 
 	def Izlaz(self):
 		self.close()
+
 
 class AVpSet(ConfigListScreen, Screen):
   
@@ -284,6 +286,7 @@ class AVpSet(ConfigListScreen, Screen):
 
 	def Izlaz(self):
 		self.close()
+
 
 class LoopSyncMain(ConfigListScreen, Screen):
 	def __init__(self, session, args=None):
@@ -529,29 +532,36 @@ class LoopSyncMain(ConfigListScreen, Screen):
 
 		self.LEDtimeTimer.start(1000, True)
 
+
 def FanCtrlMain(session, **kwargs):
 	session.open(FanCtrlConfig)
+
 
 def CRClockMain(session, **kwargs):
 	session.open(CRClock)
 
+
 def AVpSetMain(session, **kwargs):
 	session.open(AVpSet)
+
 
 def startSetup(menuid):
 	if menuid != "system":
 		return []
 	return [(_("[Fan Set]"), FanCtrlMain, " FanCtrlSetupMain_setup", 9)]
 
+
 def startSetup1(menuid):
 	if menuid != "system":
 		return []
 	return [(_("[Card Reader Set]"), CRClockMain, " CRClock_setup", 9)]
 
+
 def startSetup2(menuid):
 	if menuid != "system":
 		return []
 	return [(_("[A/V settings +]"), AVpSetMain, " AVp_setup", 9)]
+
 
 def sessionstart(session, **kwargs):
 	session.open(LoopSyncMain)
