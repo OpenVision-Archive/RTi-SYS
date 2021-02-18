@@ -79,7 +79,8 @@ class FanCtrlConfig(ConfigListScreen, Screen):
 		self["config"].l.setList(self.list)
 
 	def SaveCfg(self):
-		if config.plugins.RtiSYS.FanOff.value == "": config.plugins.RtiSYS.FanOff.value = "*99#"
+		if config.plugins.RtiSYS.FanOff.value == "":
+			config.plugins.RtiSYS.FanOff.value = "*99#"
 		config.plugins.RtiSYS.FanMode.save()
 		config.plugins.RtiSYS.FanON.save()
 		config.plugins.RtiSYS.FanOff.save()
@@ -226,23 +227,34 @@ class AVpSet(ConfigListScreen, Screen):
 		if ind == 0 :
 			self["poraka"].setText("The set property allows an application to force the decoder to mark the pictures in a certain way, including forcing progressive, and forcing interlaced bottom first or top first.")
 			el = str(config.plugins.RtiSYS.ScanMode.value)
-			if el == "1": expl = "EMhwlibScanMode_Source  Use the information given by the video decoder (default)."
-			if el == "2": expl = "EMhwlibScanMode_Progressive  Forces the input to be progressive."
-			if el == "3": expl = "EMhwlibScanMode_Interlaced_TopFieldFirst  Forces the input to be interlaced top field first."
-			if el == "4": expl = "EMhwlibScanMode_Interlaced_BotFieldFirst  Forces the input to be interlaced bottom field first."
+			if el == "1":
+				expl = "EMhwlibScanMode_Source  Use the information given by the video decoder (default)."
+			if el == "2":
+				expl = "EMhwlibScanMode_Progressive  Forces the input to be progressive."
+			if el == "3":
+				expl = "EMhwlibScanMode_Interlaced_TopFieldFirst  Forces the input to be interlaced top field first."
+			if el == "4":
+				expl = "EMhwlibScanMode_Interlaced_BotFieldFirst  Forces the input to be interlaced bottom field first."
 		elif ind == 1 :
 			self["poraka"].setText("The set property allows an application to force a preferred interlace or progressive algorithm in case of unsure output format (usually stream).")
 			el = str(config.plugins.RtiSYS.Interlaced.value)
-			if el == "1": expl = "INTERLACED_PROGRESSIVE_ALGORITHM_USING_DECODER_SPECIFICATION  Use the decoder defined method (default)."
-			if el == "2": expl = "INTERLACED_PROGRESSIVE_ALGORITHM_USING_MPEG2_PROGRESSIVE_SEQ  When the extended sequence header is defined as progressive and the picture header says otherwise, force the sequence to be progressive."
-			if el == "3": expl = "INTERLACED_PROGRESSIVE_ALGORITHM_USING_MPEG2_MENU_PROGRESSIVE  When playing a DVD menu stream, this flags forces the decoder to make decoded pictures progressive to make displayed images stable. Only valid for MPEG-2 streams."
+			if el == "1":
+				expl = "INTERLACED_PROGRESSIVE_ALGORITHM_USING_DECODER_SPECIFICATION  Use the decoder defined method (default)."
+			if el == "2":
+				expl = "INTERLACED_PROGRESSIVE_ALGORITHM_USING_MPEG2_PROGRESSIVE_SEQ  When the extended sequence header is defined as progressive and the picture header says otherwise, force the sequence to be progressive."
+			if el == "3":
+				expl = "INTERLACED_PROGRESSIVE_ALGORITHM_USING_MPEG2_MENU_PROGRESSIVE  When playing a DVD menu stream, this flags forces the decoder to make decoded pictures progressive to make displayed images stable. Only valid for MPEG-2 streams."
 		elif ind == 2 :
 			self["poraka"].setText("The set property allows an application to select the scaler's deinterlacing mode. Deinterlacing is used only when the scaler's input pictures are interlaced. If the scaler is set to deinterlacing but the input is progressive, then the scaler will not use any deinterlacing.")
 			el = str(config.plugins.RtiSYS.DeinterlacingMode.value)
-			if el == "1": expl = "No deinterlacing is used. At each instance, only one field is taken from the source to generate the output picture. This can result in half the vertical resolution on the display."
-			if el == "2": expl = "Weave deinterlacing is used. This is the opposite of Bob deinterlacing where the complete input frame is used each time. There is no problem with half resolution, but in the case of motion between the two fields, the result is very bad."
-			if el == "3": expl = "This is a slightly different form of EMhwlibDeinterlacingMode_Weave where a weight is applied on each field in order to diminish the motion's artifacts."
-			if el == "4": expl = "Both Weave and Bob deinterlacing are used. Two scalers are used, one to compute the movement between field N-1 and N+1, and the other to generate a Weave N frame from field N-1 and field N+1. The other scaler applies a Bob algorithm on field N to generate the frame N. Finally, the two frames are mixed, with an alpha modulated by the movement detection. In the areas where no motion or little motion is detected, the Weave frame N is used, but in case of motion the Bob frame is used. Finally, the alpha can be also statically modified (on top of movement detection) with two weight factors to increase the Weave or Bob weight in the final frame."
+			if el == "1":
+				expl = "No deinterlacing is used. At each instance, only one field is taken from the source to generate the output picture. This can result in half the vertical resolution on the display."
+			if el == "2":
+				expl = "Weave deinterlacing is used. This is the opposite of Bob deinterlacing where the complete input frame is used each time. There is no problem with half resolution, but in the case of motion between the two fields, the result is very bad."
+			if el == "3":
+				expl = "This is a slightly different form of EMhwlibDeinterlacingMode_Weave where a weight is applied on each field in order to diminish the motion's artifacts."
+			if el == "4":
+				expl = "Both Weave and Bob deinterlacing are used. Two scalers are used, one to compute the movement between field N-1 and N+1, and the other to generate a Weave N frame from field N-1 and field N+1. The other scaler applies a Bob algorithm on field N to generate the frame N. Finally, the two frames are mixed, with an alpha modulated by the movement detection. In the areas where no motion or little motion is detected, the Weave frame N is used, but in case of motion the Bob frame is used. Finally, the alpha can be also statically modified (on top of movement detection) with two weight factors to increase the Weave or Bob weight in the final frame."
 		self["poraka1"].setText(expl)
 		self.ActCfg()
 
@@ -426,11 +438,13 @@ class LoopSyncMain(ConfigListScreen, Screen):
 		f.close()
 		TBefore = mktime(datetime.utcnow().timetuple())
 		cmd = str("ntpdate 0.debian.pool.ntp.org")
-		if hw_type in ('elite', 'premium', 'premium+', 'ultra'): return
+		if hw_type in ('elite', 'premium', 'premium+', 'ultra'):
+			return
 		TAfter = mktime(datetime.utcnow().timetuple())
 		self.testRTCSet = 1
 		deviation = abs(TAfter - TBefore)
-		if deviation <= 60: return
+		if deviation <= 60:
+			return
 		UTCTim = datetime.utcnow().timetuple()
 		godina = '0000' + str(UTCTim [0])
 		godina = godina [len(godina) - 4:]
@@ -449,7 +463,8 @@ class LoopSyncMain(ConfigListScreen, Screen):
 		ipos1 = TimeZoneS.find("(GMT")
 		ipos2 = TimeZoneS.find(")")
 		tmp = TimeZoneS[ipos1+4:ipos2]
-		if len(tmp) == 0 : tmp = "+00"
+		if len(tmp) == 0 :
+			tmp = "+00"
 		tzpredznak = tmp[:1]
 		tzvalue = str(int(tmp[1:3]))
 		TimeString = TimeString + tzpredznak + tzvalue
@@ -496,7 +511,8 @@ class LoopSyncMain(ConfigListScreen, Screen):
 						self.ledstatus = 1
 				self.recf = 1
 				self.rstate += 1
-				if self.rstate > 2: self.rstate = 1
+				if self.rstate > 2:
+					self.rstate = 1
 				try:
 					os.system('echo "' + str(self.rstate) + '" > /proc/led')
 				except:
