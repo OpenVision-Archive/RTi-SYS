@@ -69,7 +69,7 @@ class FanCtrlConfig(ConfigListScreen, Screen):
 		self.createSetup()
 
 	def createSetup(self):
-		self.list = [ ]
+		self.list = []
 		self.list.append(getConfigListEntry(_("FAN:"), config.plugins.RtiSYS.FanMode))
 #
 		if config.plugins.RtiSYS.FanMode.value == "999":
@@ -140,7 +140,7 @@ class CRClock(ConfigListScreen, Screen):
 		self.createSetup()
 
 	def createSetup(self):
-		self.list = [ ]
+		self.list = []
 		clockstr = str(config.plugins.RtiSYS.CRClock.value) + "MHz"
 		self.list.append(getConfigListEntry(_("CR Clock   : " + clockstr), config.plugins.RtiSYS.CRClock))
 		self.list.append(getConfigListEntry(_("CR Voltage:"), config.plugins.RtiSYS.CRVoltage))
@@ -217,14 +217,14 @@ class AVpSet(ConfigListScreen, Screen):
 
 	def createSetup(self):
 		expl = ""
-		self.list = [ ]
+		self.list = []
 		self.list.append(getConfigListEntry(_("Scan Mode   : "), config.plugins.RtiSYS.ScanMode))
 		self.list.append(getConfigListEntry(_("Interlaced Algo:"), config.plugins.RtiSYS.Interlaced))
 		self.list.append(getConfigListEntry(_("Deinterlacing Mode:"), config.plugins.RtiSYS.DeinterlacingMode))
 		self["config"].list = self.list
 		self["config"].l.setList(self.list)
 		ind = self["config"].getCurrentIndex()
-		if ind == 0 :
+		if ind == 0:
 			self["poraka"].setText("The set property allows an application to force the decoder to mark the pictures in a certain way, including forcing progressive, and forcing interlaced bottom first or top first.")
 			el = str(config.plugins.RtiSYS.ScanMode.value)
 			if el == "1":
@@ -235,7 +235,7 @@ class AVpSet(ConfigListScreen, Screen):
 				expl = "EMhwlibScanMode_Interlaced_TopFieldFirst  Forces the input to be interlaced top field first."
 			if el == "4":
 				expl = "EMhwlibScanMode_Interlaced_BotFieldFirst  Forces the input to be interlaced bottom field first."
-		elif ind == 1 :
+		elif ind == 1:
 			self["poraka"].setText("The set property allows an application to force a preferred interlace or progressive algorithm in case of unsure output format (usually stream).")
 			el = str(config.plugins.RtiSYS.Interlaced.value)
 			if el == "1":
@@ -244,7 +244,7 @@ class AVpSet(ConfigListScreen, Screen):
 				expl = "INTERLACED_PROGRESSIVE_ALGORITHM_USING_MPEG2_PROGRESSIVE_SEQ  When the extended sequence header is defined as progressive and the picture header says otherwise, force the sequence to be progressive."
 			if el == "3":
 				expl = "INTERLACED_PROGRESSIVE_ALGORITHM_USING_MPEG2_MENU_PROGRESSIVE  When playing a DVD menu stream, this flags forces the decoder to make decoded pictures progressive to make displayed images stable. Only valid for MPEG-2 streams."
-		elif ind == 2 :
+		elif ind == 2:
 			self["poraka"].setText("The set property allows an application to select the scaler's deinterlacing mode. Deinterlacing is used only when the scaler's input pictures are interlaced. If the scaler is set to deinterlacing but the input is progressive, then the scaler will not use any deinterlacing.")
 			el = str(config.plugins.RtiSYS.DeinterlacingMode.value)
 			if el == "1":
@@ -419,10 +419,10 @@ class LoopSyncMain(ConfigListScreen, Screen):
 		f = open("/proc/stb/info/model", 'r')
 		hw_type = f.readline().strip()
 		f.close()
-		godina = int(datetime.utcnow().timetuple() [0])
-		if self.testRTCSet <> 0 : 
+		godina = int(datetime.utcnow().timetuple()[0])
+		if self.testRTCSet <> 0: 
 			return
-		if godina >= 2012 : 
+		if godina >= 2012: 
 			return
 		else:
 			if self.testno >= 60:
@@ -446,24 +446,24 @@ class LoopSyncMain(ConfigListScreen, Screen):
 		if deviation <= 60:
 			return
 		UTCTim = datetime.utcnow().timetuple()
-		godina = '0000' + str(UTCTim [0])
-		godina = godina [len(godina) - 4:]
-		mesec = '00' + str(UTCTim [1])
-		mesec = mesec [len(mesec) - 2:]
-		den = '00' + str(UTCTim [2])
-		den = den [len(den) - 2:]
-		saat = '00' + str(UTCTim [3])
-		saat = saat [len(saat) - 2:]
-		minuti = '00' + str(UTCTim [4])
-		minuti = minuti [len(minuti) - 2:]
-		sekundi = '00' + str(UTCTim [5])
-		sekundi = sekundi [len(sekundi) - 2:]
+		godina = '0000' + str(UTCTim[0])
+		godina = godina[len(godina) - 4:]
+		mesec = '00' + str(UTCTim[1])
+		mesec = mesec[len(mesec) - 2:]
+		den = '00' + str(UTCTim[2])
+		den = den[len(den) - 2:]
+		saat = '00' + str(UTCTim[3])
+		saat = saat[len(saat) - 2:]
+		minuti = '00' + str(UTCTim[4])
+		minuti = minuti[len(minuti) - 2:]
+		sekundi = '00' + str(UTCTim[5])
+		sekundi = sekundi[len(sekundi) - 2:]
 		TimeString = godina + mesec + den + saat + minuti + sekundi
 		TimeZoneS = config.timezone.val.value
 		ipos1 = TimeZoneS.find("(GMT")
 		ipos2 = TimeZoneS.find(")")
 		tmp = TimeZoneS[ipos1+4:ipos2]
-		if len(tmp) == 0 :
+		if len(tmp) == 0:
 			tmp = "+00"
 		tzpredznak = tmp[:1]
 		tzvalue = str(int(tmp[1:3]))
@@ -540,17 +540,17 @@ def AVpSetMain(session, **kwargs):
 
 def startSetup(menuid):
 	if menuid != "system":
-		return [ ]
+		return []
 	return [(_("[Fan Set]"), FanCtrlMain, " FanCtrlSetupMain_setup", 9)]
 
 def startSetup1(menuid):
 	if menuid != "system":
-		return [ ]
+		return []
 	return [(_("[Card Reader Set]"), CRClockMain, " CRClock_setup", 9)]
 
 def startSetup2(menuid):
 	if menuid != "system":
-		return [ ]
+		return []
 	return [(_("[A/V settings +]"), AVpSetMain, " AVp_setup", 9)]
 
 def sessionstart(session, **kwargs):
