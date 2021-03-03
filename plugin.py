@@ -10,13 +10,13 @@ from Screens.Screen import Screen
 from enigma import eTimer
 from Components.Sources.List import List
 import os
-import Screens.InfoBar
 from enigma import *
-from Components.config import configfile, getConfigListEntry, ConfigEnableDisable, \
-	ConfigYesNo, ConfigText, ConfigDateTime, ConfigClock, ConfigNumber, ConfigSelectionNumber, ConfigSelection, \
-	config, ConfigSubsection, ConfigSubList, ConfigSubDict, ConfigIP, ConfigSlider, ConfigDirectory, ConfigInteger
-from time import gmtime, strftime, localtime, mktime, time, sleep, mktime
-from datetime import datetime, timedelta
+from Components.config import getConfigListEntry, ConfigSelection, config, ConfigSubsection, ConfigSlider
+from time import mktime, time
+from datetime import datetime
+from Tools.StbHardware import getBoxProc
+
+procmodel = getBoxProc()
 
 config.plugins.RtiSYS = ConfigSubsection()
 config.plugins.RtiSYS.FanMode = ConfigSelection(choices={"0": _("Always ON"), "998": _("Always Off"), "1": _("Off in Standby"), "2": _("Cycle (5 Min ON ~ 5 Min Off)"), "999": _("Custom - Cycle")}, default="0")
@@ -308,16 +308,13 @@ class LoopSyncMain(ConfigListScreen, Screen):
 		self.RtimeTimer = eTimer()
 		self.RtiminimeTimer = eTimer()
 		self.AVptimeTimer = eTimer()
-		f = open("/proc/stb/info/model", 'r')
-		hw_type = f.readline().strip()
-		f.close()
-		if hw_type in ("me", "minime"):
+		if procmodel in ("me", "minime"):
 			self.LEDtimeTimer.callback.append(self.updateLED)
-			if hw_type == "minime":
+			if procmodel == "minime":
 				self.RtiminimeTimer.callback.append(self.updateCR)
-		elif hw_type in ('elite', 'premium', 'premium+', 'ultra'):
+		elif procmodel in ('elite', 'premium', 'premium+', 'ultra'):
 			self.LEDtimeTimer.callback.append(self.updateLEDHD)
-		if hw_type in ('ultra', 'premium+'):
+		if procmodel in ('ultra', 'premium+'):
 			self.FANtimeTimer.callback.append(self.updateFAN)
 		self.RtimeTimer.callback.append(self.updateRT)
 		self.AVptimeTimer.callback.append(self.updateAVp)
@@ -419,9 +416,6 @@ class LoopSyncMain(ConfigListScreen, Screen):
 		return
 
 	def updateRT(self):
-		f = open("/proc/stb/info/model", 'r')
-		hw_type = f.readline().strip()
-		f.close()
 		godina = int(datetime.utcnow().timetuple()[0])
 		if self.testRTCSet <> 0:
 			return
@@ -436,12 +430,9 @@ class LoopSyncMain(ConfigListScreen, Screen):
 			self.RtimeTimer.start(10000, True)
 
 	def SetTime(self):
-		f = open("/proc/stb/info/model", 'r')
-		hw_type = f.readline().strip()
-		f.close()
 		TBefore = mktime(datetime.utcnow().timetuple())
 		cmd = str("ntpdate 0.debian.pool.ntp.org")
-		if hw_type in ('elite', 'premium', 'premium+', 'ultra'):
+		if procmodel in ('elite', 'premium', 'premium+', 'ultra'):
 			return
 		TAfter = mktime(datetime.utcnow().timetuple())
 		self.testRTCSet = 1
@@ -568,16 +559,13 @@ def sessionstart(session, **kwargs):
 
 
 def Plugins(**kwargs):
-	f = open("/proc/stb/info/model", 'r')
-	hw_type = f.readline().strip()
-	f.close()
-	if hw_type in ('ultra', 'premium+'):
+	if procmodel in ('ultra', 'premium+'):
 		return [
 			PluginDescriptor(name="FanCtrl", description="FAN Controll", where=PluginDescriptor.WHERE_MENU, fnc=startSetup),
 			PluginDescriptor(name="AVp_setup", description="scan mode & interlaced algo", where=PluginDescriptor.WHERE_MENU, fnc=startSetup2),
 			PluginDescriptor(where=[PluginDescriptor.WHERE_SESSIONSTART], fnc=sessionstart)
 			]
-	elif hw_type == 'minime':
+	elif procmodel == 'minime':
 		return [
 			PluginDescriptor(name="CRClock_setup", description="CR set freq", where=PluginDescriptor.WHERE_MENU, fnc=startSetup1),
 			PluginDescriptor(name="AVp_setup", description="scan mode & interlaced algo", where=PluginDescriptor.WHERE_MENU, fnc=startSetup2),
